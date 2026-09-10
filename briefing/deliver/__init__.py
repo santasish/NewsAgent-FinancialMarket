@@ -15,7 +15,7 @@ from briefing.alerts import failure_report, send_alert
 from briefing.config import Config
 from briefing.deliver.gcal import TITLES, create_event
 from briefing.deliver import telegram
-from briefing.deliver.gsheets import append_row
+from briefing.deliver.gsheets import append_issue, append_row
 from briefing.deliver.mail import send_briefing
 from briefing.schedule import IST
 
@@ -93,6 +93,18 @@ def deliver(
 
     sheet_id = config.get("google.sheet_id", "")
     if sheet_id:
+        try:
+            issue_link = append_issue(
+                sheet_id,
+                date=day.isoformat(),
+                edition=TITLES.get(prompt_name, prompt_name),
+                text=body,
+            )
+            notes = f"{notes} | Full issue: {issue_link}" if notes else f"Full issue: {issue_link}"
+        except Exception as exc:
+            # The archive row is still worth writing even if the full-text copy
+            # failed — a run isn't degraded over a missing convenience link.
+            result.errors.append(f"Sheets full-text archive: {type(exc).__name__}: {exc}")
         try:
             append_row(
                 sheet_id,
