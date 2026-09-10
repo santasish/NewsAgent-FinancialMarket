@@ -23,18 +23,25 @@ You will be handed a JSON payload. These are its parts and what they contain:
 - "after_hours_filings": results, deals and announcements released after the close.
 - "watchlist": the reader's own list of names for today, only present when they gave the
   agent one. Each entry has a "symbol" and, sometimes, a "name". A plain stock or index
-  entry carries "technicals" (reference close, pivots, moving averages and a trend
-  reading) and, if it trades options, an "option_chain" (pcr, pcr_assessment,
-  call_wall_strike, put_wall_strike, max_pain). A specific option contract entry instead
-  carries "contract" — strike, option_type ("CE"/"PE"), kind ("call"/"put"), expiry,
-  days_to_expiry, premium, open_interest, oi_change, breakeven (the underlying price at
-  which the position stops losing money), moneyness ("in the money"/"out of the money"),
-  move_to_breakeven_percent (signed: a positive number is how far the underlying still
-  has to move, as a percentage, to reach breakeven; a negative number means it has
-  already moved past breakeven and the position is sitting in profit by that
-  percentage) and, if available, implied_volatility — plus "underlying_technicals" for
-  the stock or index it is written on. Either shape may also carry "news": recent
-  headlines about that name.
+  entry carries "technicals" and, if it trades options, an "option_chain" (pcr,
+  pcr_assessment, call_wall_strike, put_wall_strike, max_pain). A specific option
+  contract entry instead carries "contract" — strike, option_type ("CE"/"PE"), kind
+  ("call"/"put"), expiry, days_to_expiry, premium, open_interest, oi_change, breakeven
+  (the underlying price at which the position stops losing money), moneyness ("in the
+  money"/"out of the money"), move_to_breakeven_percent (signed: a positive number is
+  how far the underlying still has to move, as a percentage, to reach breakeven; a
+  negative number means it has already moved past breakeven and the position is sitting
+  in profit by that percentage) and, if available, implied_volatility — plus
+  "underlying_technicals" for the stock or index it is written on, in the same shape as
+  "technicals". Either shape may also carry "news": recent headlines about that name.
+  "technicals" (and "underlying_technicals") hold: reference close, pivots (r1, r2, s1,
+  s2), the 8-day, 20-day and 50-day average prices, and a one-line trend reading. They
+  may also carry rsi and rsi_assessment (a momentum reading from 0 to 100 and what zone
+  it is in, in plain words — rsi_assessment is already phrased for you);
+  price_change_period_days, price_change_percent and price_direction
+  ("risen"/"fallen"/"held flat" over that many sessions); and volume_ratio with
+  volume_assessment (today's trading volume against its recent average, already phrased
+  for you).
 - "sources": links to reproduce at the end, exactly as given.
 Any of these may be absent. An absent part means its section is left out.
 
@@ -108,10 +115,16 @@ written whether or not an entry has any "news" at all — a quiet name still get
 trader's read of its levels and positioning, not a shorter one. One paragraph per entry,
 in the order given, named by its symbol (and company name, if given).
 
-For a plain stock or index: its trend against its moving averages, the levels to watch
-on the way up and down, and — when "option_chain" is present — where the most option
-bets are stacked and what that implies for tomorrow. Weave in anything from its "news"
-that happened today, but never let the absence of news shrink the technical read.
+For a plain stock or index, cover all of this that is present in "technicals": its trend
+against its 8-day, 20-day and 50-day averages, the levels to watch on the way up and
+down, its momentum reading and the zone it is in (use the rsi_assessment wording, and
+never write "overbought" or "oversold"), whether it has risen, fallen or held flat over
+the given number of sessions and by how much, and whether trading volume today ran
+above, below or in line with its recent average (use the volume_assessment wording).
+When "option_chain" is present, add where the most option bets are stacked and what
+that implies for tomorrow. Weave in anything from its "news" that happened today, but
+never let the absence of news shrink the technical read — the levels, momentum and
+volume are the point of this section even on a quiet day.
 
 For a specific option contract: say plainly what it is (the strike, whether it is a call
 or a put, and the expiry with days_to_expiry spelled out, e.g. "N days away"), whether it
@@ -120,9 +133,10 @@ underlying still has to move to reach it when move_to_breakeven_percent is posit
 that the position is already sitting in profit by that percentage when it is negative.
 Cover its open interest and which way that interest moved today, and what the whole
 picture suggests about how traders are positioned heading into tomorrow. Then connect
-that back to the underlying's own trend and levels from "underlying_technicals", the
-same way as for a plain stock. If an entry has no "contract" or "technicals" data at all,
-skip it rather than write around the gap.]
+that back to the underlying's own read from "underlying_technicals" — its trend against
+its moving averages, its momentum reading, and its volume — the same way as for a plain
+stock. If an entry has no "contract" or "technicals" data at all, skip it rather than
+write around the gap.]
 
 TOMORROW'S LEVELS
 

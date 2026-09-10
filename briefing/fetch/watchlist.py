@@ -31,6 +31,10 @@ def _rows(series: Any) -> list[dict[str, Any]]:
             "high": _clean(row["High"]),
             "low": _clean(row["Low"]),
             "close": _clean(row["Close"]),
+            # Volume feeds the watchlist's volume-trend reading (briefing.compute.momentum);
+            # the main index/macro history from briefing.fetch.macro has no equivalent use
+            # for it, which is why that fetch doesn't carry it.
+            "volume": _clean(row["Volume"]),
         }
         for index, row in tail.iterrows()
     ]

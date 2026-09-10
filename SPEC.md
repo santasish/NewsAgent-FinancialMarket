@@ -149,6 +149,17 @@ percentile, exhaustion layers, beta) was ported and run over the index series, t
 at the user's request. The briefing is back to classic pivots and 20/50-DMA. Do not
 reintroduce without asking.
 
+**Richer technicals reintroduced, but watchlist-only (later on 2026-09-10).** Asked
+explicitly this time, and scoped to the user's own watchlist entries only — the
+market-wide Nifty/Bank Nifty sections above are untouched. `briefing/compute/momentum.py`
+adds an 8-day moving average, Wilder's RSI (plain-worded zones, never "overbought" or
+"oversold" — those stay banned), a signed 5-day price-momentum reading, and a
+volume-vs-20-day-average reading. Option contracts also get `contract_snapshot`'s
+breakeven/moneyness/`move_to_breakeven_percent` (signed: positive = still has to move
+that far; negative = already past it, in profit by that much). Don't extend this to the
+main index sections without asking again — that's the same boundary as above, just drawn
+one level down.
+
 **Access notes**
 - NSE `/api/` paths return 403 to a bare request. A session must first load
   `/market-data/live-equity-market` and `/option-chain` to collect cookies, then send the

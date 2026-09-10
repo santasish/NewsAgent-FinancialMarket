@@ -55,8 +55,23 @@ the right. Give the technical name at most once per issue, in brackets, if at al
 - Pivots (r1, r2, s1, s2, pivot) -> "if the index climbs, the first hurdle is R1 and the
   next is R2; if it slips, the first cushion is S1 and then S2". Never write "R1", "S1",
   "resistance" or "support" without the plain phrase alongside.
-- dma_20 / dma_50 -> "the average price over the last 20 days" and "over the last 50
-  days". Use the trend wording from the data.
+- dma_8 / dma_20 / dma_50 -> "the average price over the last 8/20/50 days". Use the
+  trend wording from the data.
+- rsi / rsi_assessment (watchlist entries only) -> describe the zone using the
+  rsi_assessment wording as given ("stretched to the upside/downside", "in a neutral
+  zone"). You may add the number in brackets. Never write "RSI", "momentum indicator",
+  "overbought" or "oversold".
+- price_change_percent / price_direction (watchlist entries only) -> "the shares have
+  risen/fallen X% over the last N sessions", using price_direction and
+  price_change_period_days for the wording.
+- volume_ratio / volume_assessment (watchlist entries only) -> describe it using the
+  volume_assessment wording as given ("above its recent average", and so on). Never
+  write "volume ratio" as a label.
+- breakeven / moneyness / move_to_breakeven_percent (watchlist option contracts only) ->
+  say whether the contract is in or out of the money, then how far the underlying still
+  needs to move to breakeven (if move_to_breakeven_percent is positive) or how far past
+  it the position already is, in profit (if negative). Never write "moneyness" as a
+  label.
 - Brent -> "oil (Brent crude)" then "oil"
 - us_10y_yield -> "the interest rate on ten-year US government bonds"
 - dxy -> "the dollar index, which tracks the dollar against other major currencies"

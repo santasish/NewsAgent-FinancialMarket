@@ -154,6 +154,31 @@ def levels_block(levels: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def momentum_block(data: dict[str, Any] | None) -> dict[str, Any]:
+    """Pre-formatted RSI/momentum/volume readings — watchlist-only, see
+    briefing.compute.momentum. Merged into a watchlist entry's "technicals" or
+    "underlying_technicals" dict alongside the pivots/DMA already there.
+    """
+    if not data:
+        return {}
+    out: dict[str, Any] = {}
+    if "dma_8" in data:
+        out["dma_8"] = num(data["dma_8"])
+    if "rsi" in data:
+        out["rsi"] = num(data["rsi"])
+        out["rsi_assessment"] = data["rsi_assessment"]
+    momentum = data.get("momentum")
+    if momentum:
+        out["price_change_period_days"] = momentum["period_days"]
+        out["price_change_percent"] = pct(momentum["change_percent"])
+        out["price_direction"] = momentum["direction"]
+    volume = data.get("volume_trend")
+    if volume:
+        out["volume_ratio"] = num(volume["ratio"])
+        out["volume_assessment"] = volume["assessment"]
+    return out
+
+
 def watchlist_block(raw: list[dict[str, Any]], day: date) -> list[dict[str, Any]]:
     """Shape gathered watchlist data into the pre-formatted numbers the prompt prints.
 
@@ -171,6 +196,7 @@ def watchlist_block(raw: list[dict[str, Any]], day: date) -> list[dict[str, Any]
 
         if item.get("technicals"):
             shaped["technicals"] = levels_block(item["technicals"])
+            shaped["technicals"].update(momentum_block(item.get("momentum")))
         oc = item.get("option_chain")
         if oc:
             shaped["option_chain"] = {
@@ -208,6 +234,7 @@ def watchlist_block(raw: list[dict[str, Any]], day: date) -> list[dict[str, Any]
                 shaped["contract"]["move_to_breakeven_percent"] = pct(contract["move_to_breakeven_percent"])
         if item.get("underlying_technicals"):
             shaped["underlying_technicals"] = levels_block(item["underlying_technicals"])
+            shaped["underlying_technicals"].update(momentum_block(item.get("underlying_momentum")))
 
         if item.get("news"):
             shaped["news"] = [shape_news(n) for n in item["news"]]

@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from briefing.compute import analyse_option_chain, compute_levels, contract_snapshot
+from briefing.compute import analyse_option_chain, compute_levels, contract_snapshot, extra_technicals
 from briefing.config import Config
 from briefing.dedup import headline_key, load_seen, record_seen
 from briefing.deliver.gsheets import read_watchlist
@@ -162,6 +162,7 @@ def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
         symbol = entry["symbol"]
         history = quotes.get(symbol, [])
         levels = compute_levels(history) if history else None
+        momentum = extra_technicals(history) if history else {}
         item_news = news_by_symbol.get(symbol, [])[:4]
 
         if "strike" in entry:
@@ -172,6 +173,7 @@ def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
                 "name": entry.get("name"),
                 "contract": snapshot,
                 "underlying_technicals": levels,
+                "underlying_momentum": momentum or None,
                 "news": item_news,
             })
         else:
@@ -181,6 +183,7 @@ def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
                 "symbol": symbol,
                 "name": entry.get("name"),
                 "technicals": levels,
+                "momentum": momentum or None,
                 "option_chain": analysis,
                 "news": item_news,
             })
