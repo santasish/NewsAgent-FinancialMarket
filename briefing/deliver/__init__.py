@@ -100,7 +100,12 @@ def deliver(
                 edition=TITLES.get(prompt_name, prompt_name),
                 text=body,
             )
-            notes = f"{notes} | Full issue: {issue_link}" if notes else f"Full issue: {issue_link}"
+            # A plain "text: https://..." string doesn't reliably render as a clickable
+            # link once it's part of a longer cell, so the cell is written as a
+            # =HYPERLINK() formula instead. append_row uses valueInputOption=USER_ENTERED,
+            # which evaluates it rather than storing it as a literal string.
+            label = f"{notes} | Full issue" if notes else "Full issue"
+            notes = f'=HYPERLINK("{issue_link}", "{label.replace(chr(34), chr(34) * 2)}")'
         except Exception as exc:
             # The archive row is still worth writing even if the full-text copy
             # failed — a run isn't degraded over a missing convenience link.
