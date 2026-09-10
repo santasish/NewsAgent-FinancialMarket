@@ -8,6 +8,7 @@ from briefing.config import Config
 from briefing.deliver import gsheets
 from briefing.fetch.base import FetchResult
 from briefing.fetch.nse import _resolve_expiry
+from briefing.fetch.watchlist import fetch_watchlist_quotes
 from briefing.payload.common import PayloadContext, watchlist_block
 from briefing.payload.evening import build_evening_payload
 from briefing.payload.morning import build_morning_payload
@@ -81,6 +82,43 @@ class ReadWatchlistTests(unittest.TestCase):
         gsheets.read_watchlist("sheet123")
 
         sheets.spreadsheets().batchUpdate.assert_called_once()
+
+
+class FetchWatchlistQuotesTests(unittest.TestCase):
+    """Regression coverage for a real bug: with group_by="ticker", yfinance keeps a
+    (Ticker, Price) MultiIndex even when only one symbol is requested — it does not
+    flatten the way a bare single-ticker download does. A single-symbol watchlist
+    silently returned no history until this was handled explicitly.
+    """
+
+    def _frame(self, tickers: list[str]):
+        import pandas as pd
+
+        dates = pd.date_range("2026-08-01", periods=3, freq="D")
+        columns = pd.MultiIndex.from_product(
+            [tickers, ["Open", "High", "Low", "Close", "Adj Close", "Volume"]],
+            names=["Ticker", "Price"],
+        )
+        data = {}
+        for ticker in tickers:
+            for field in ("Open", "High", "Low", "Close", "Adj Close", "Volume"):
+                data[(ticker, field)] = [100.0, 101.0, 102.0]
+        return pd.DataFrame(data, index=dates, columns=columns)
+
+    @patch("yfinance.download")
+    def test_single_symbol_history_is_not_dropped(self, download):
+        download.return_value = self._frame(["GVT&D.NS"])
+        result = fetch_watchlist_quotes(["GVT&D"])
+        self.assertTrue(result.ok)
+        self.assertIn("GVT&D", result.data)
+        self.assertEqual(len(result.data["GVT&D"]), 3)
+
+    @patch("yfinance.download")
+    def test_multiple_symbols_each_get_their_own_history(self, download):
+        download.return_value = self._frame(["TCS.NS", "INFY.NS"])
+        result = fetch_watchlist_quotes(["TCS", "INFY"])
+        self.assertTrue(result.ok)
+        self.assertEqual(set(result.data), {"TCS", "INFY"})
 
 
 class ResolveExpiryTests(unittest.TestCase):
@@ -273,6 +311,28 @@ class GatherWatchlistTests(unittest.TestCase):
         self.assertEqual(option["symbol"], "GVT&D")
         self.assertEqual(option["contract"]["premium"], 42.5)
         self.assertIsNotNone(option["underlying_technicals"])
+
+    @patch("briefing.pipeline.news_fetch.fetch_news")
+    @patch("briefing.pipeline.nse_fetch.fetch_option_chain")
+    @patch("briefing.pipeline.watchlist_fetch.fetch_watchlist_quotes")
+    @patch("briefing.pipeline.read_watchlist")
+    def test_unrelated_news_is_filtered_out(self, read_watchlist, fetch_quotes, fetch_chain, fetch_news):
+        """Google News RSS sometimes falls back to unrelated 'trending' items when a
+        quoted query matches nothing, instead of returning an empty feed. A headline
+        that never mentions the symbol or company name must not reach the payload.
+        """
+        read_watchlist.return_value = [{"symbol": "GVT&D"}]
+        fetch_quotes.return_value = FetchResult.failure("watchlist.yfinance", "n/a")
+        fetch_chain.return_value = FetchResult.failure("nse.option_chain", "n/a")
+        fetch_news.return_value = FetchResult.success("news.google_rss", [
+            {"headline": "Axis Bank CEO sees rate hike", "topic": "watchlist::GVT&D", "source": "GoogleNews"},
+            {"headline": "GVT&D wins large transformer order", "topic": "watchlist::GVT&D", "source": "GoogleNews"},
+        ])
+
+        out = pipeline.gather_watchlist(self.config(), DAY)
+
+        self.assertEqual(len(out[0]["news"]), 1)
+        self.assertEqual(out[0]["news"][0]["headline"], "GVT&D wins large transformer order")
 
     @patch("briefing.pipeline.read_watchlist")
     def test_more_than_the_cap_is_trimmed(self, read_watchlist):

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import csv
 import io
+import urllib.parse
 from datetime import date, datetime, timedelta
 from typing import Any
 
@@ -226,15 +227,19 @@ def fetch_option_chain(
     def run() -> dict[str, Any]:
         referer = f"{BASE}/option-chain"
         segment = "Indices" if symbol.upper() in INDEX_SYMBOLS else "Stock"
+        # A symbol like "GVT&D" breaks the query string if interpolated raw — the "&"
+        # reads as a parameter separator and silently truncates it to "GVT".
+        quoted_symbol = urllib.parse.quote(symbol, safe="")
         info = session.get_json(
-            f"/api/option-chain-contract-info?symbol={symbol}", referer=referer
+            f"/api/option-chain-contract-info?symbol={quoted_symbol}", referer=referer
         )
         expiries = info.get("expiryDates") or []
         if not expiries:
             raise ValueError(f"no expiry dates for {symbol}")
         chosen = _resolve_expiry(expiries, expiry) if expiry else expiries[0]
         raw = session.get_json(
-            f"/api/option-chain-v3?type={segment}&symbol={symbol}&expiry={chosen}",
+            f"/api/option-chain-v3?type={segment}&symbol={quoted_symbol}"
+            f"&expiry={urllib.parse.quote(chosen, safe='')}",
             referer=referer,
         )
         records = raw.get("records") or {}

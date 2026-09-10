@@ -61,20 +61,15 @@ def fetch_watchlist_quotes(symbols: list[str]) -> FetchResult:
             raise ValueError("yfinance returned no data")
 
         out: dict[str, Any] = {}
-        if len(tickers) == 1:
-            # yfinance drops the per-ticker grouping when only one symbol is requested.
-            symbol = next(iter(tickers))
-            series = frame.dropna(subset=["Close"])
+        for symbol, ticker in tickers.items():
+            # group_by="ticker" keeps a (Ticker, Price) MultiIndex even for a single
+            # symbol — it does not flatten the way a bare single-ticker download does.
+            try:
+                series = frame[ticker].dropna(subset=["Close"])
+            except KeyError:
+                continue
             if not series.empty:
                 out[symbol] = _rows(series)
-        else:
-            for symbol, ticker in tickers.items():
-                try:
-                    series = frame[ticker].dropna(subset=["Close"])
-                except KeyError:
-                    continue
-                if not series.empty:
-                    out[symbol] = _rows(series)
 
         if not out:
             raise ValueError("no watchlist symbols resolved from yfinance")

@@ -95,6 +95,21 @@ def gather_news(
     return flattened, scored
 
 
+def _mentions_watchlist_name(item: dict[str, Any], entry: dict[str, Any]) -> bool:
+    """Guard against Google News RSS's fallback behaviour: a quoted query that matches
+    nothing sometimes comes back with unrelated "trending" items instead of an empty
+    feed. Keep an article only if the symbol or company name actually appears in it.
+    """
+    if not entry:
+        return False
+    text = f"{item.get('headline', '')} {item.get('summary', '')}".lower().replace("&", "")
+    symbol = entry.get("symbol", "").lower().replace("&", "")
+    if symbol and symbol in text:
+        return True
+    name = (entry.get("name") or "").lower()
+    return bool(name and name in text)
+
+
 def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
     """Fetch technicals, options data and news for the day's watchlist, if any is set.
 
@@ -133,10 +148,14 @@ def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
     news_result = news_fetch.fetch_news(domains=config.get("news_domains"), queries=news_queries)
     news_by_symbol: dict[str, list[dict[str, Any]]] = {}
     if news_result.ok:
+        entries_by_symbol = {e["symbol"]: e for e in entries}
         for item in news_result.data:
             topic = item.get("topic", "")
-            if topic.startswith("watchlist::"):
-                news_by_symbol.setdefault(topic.split("::", 1)[1], []).append(item)
+            if not topic.startswith("watchlist::"):
+                continue
+            symbol = topic.split("::", 1)[1]
+            if _mentions_watchlist_name(item, entries_by_symbol.get(symbol, {})):
+                news_by_symbol.setdefault(symbol, []).append(item)
 
     out: list[dict[str, Any]] = []
     for entry in entries:
