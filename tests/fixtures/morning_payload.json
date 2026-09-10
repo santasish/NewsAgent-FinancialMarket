@@ -1,0 +1,198 @@
+{
+  "date": "2026-09-10",
+  "global_cues": {
+    "sp500": {
+      "last": "7,636.36",
+      "change": "-37.16",
+      "percent_change": "-0.48%"
+    },
+    "nasdaq": {
+      "last": "26,253.34",
+      "change": "-168.07",
+      "percent_change": "-0.64%"
+    },
+    "dow": {
+      "last": "52,380.66",
+      "change": "-405.41",
+      "percent_change": "-0.77%"
+    },
+    "nikkei": {
+      "last": "65,270.95",
+      "change": "128.17",
+      "percent_change": "+0.20%"
+    },
+    "hang_seng": {
+      "last": "24,954.47",
+      "change": "-320.49",
+      "percent_change": "-1.27%"
+    },
+    "ftse": {
+      "last": "10,630.64",
+      "change": "-39.46",
+      "percent_change": "-0.37%"
+    },
+    "dax": {
+      "last": "25,555.39",
+      "change": "-21.06",
+      "percent_change": "-0.08%"
+    }
+  },
+  "macro_indicators": {
+    "brent_crude": {
+      "last": "101.99",
+      "change": "0.78",
+      "percent_change": "+0.77%"
+    },
+    "us_10y_yield": {
+      "last": "4.84",
+      "change": "0.03",
+      "percent_change": "+0.65%"
+    },
+    "dxy": {
+      "last": "98.80",
+      "change": "0.03",
+      "percent_change": "+0.03%"
+    },
+    "usd_inr": {
+      "last": "95.43",
+      "change": "0.61",
+      "percent_change": "+0.64%"
+    }
+  },
+  "key_technical_pivots": {
+    "nifty_50": {
+      "reference_session": "2026-09-10",
+      "reference_close": "23,477.80",
+      "r1": "23,521.80",
+      "r2": "23,565.80",
+      "pivot": "23,450.95",
+      "s1": "23,406.95",
+      "s2": "23,336.10",
+      "dma_20": "24,027.20",
+      "dma_50": "24,170.87",
+      "trend": "below both its 20-day and 50-day averages, so the falling trend is intact"
+    },
+    "bank_nifty": {
+      "reference_session": "2026-09-10",
+      "reference_close": "56,471.95",
+      "r1": "56,620.78",
+      "r2": "56,769.61",
+      "pivot": "56,426.32",
+      "s1": "56,277.48",
+      "s2": "56,083.02",
+      "dma_20": "57,328.46",
+      "dma_50": "57,490.19",
+      "trend": "below both its 20-day and 50-day averages, so the falling trend is intact"
+    }
+  },
+  "fii_dii_derivatives": {
+    "fii_index_futures": {
+      "as_of": "09092026",
+      "long_ratio_percent": "11.0%",
+      "assessment": "foreign funds are heavily betting on the index falling"
+    },
+    "nifty_option_chain": {
+      "expiry": "15-Sep-2026",
+      "call_wall_strike": "24,000",
+      "put_wall_strike": "23,000",
+      "pcr": "0.64",
+      "pcr_assessment": "bets on a rise far outnumber bets on a fall; the market is stretched and bounces often start from here",
+      "max_pain": "23,500"
+    },
+    "fno_ban_today": [
+      "BANDHANBNK",
+      "INOXWIND",
+      "KAYNES",
+      "LICHSGFIN",
+      "MANAPPURAM",
+      "SAIL"
+    ]
+  },
+  "sector_performance": {
+    "outperforming": [
+      {
+        "name": "NIFTY MEDIA",
+        "last": "1,534.80",
+        "percent_change": "+0.55%"
+      },
+      {
+        "name": "NIFTY PSU BANK",
+        "last": "8,401.85",
+        "percent_change": "+0.39%"
+      },
+      {
+        "name": "NIFTY BANK",
+        "last": "56,471.95",
+        "percent_change": "+0.31%"
+      }
+    ],
+    "underperforming": [
+      {
+        "name": "NIFTY METAL",
+        "last": "13,304.95",
+        "percent_change": "-0.65%"
+      },
+      {
+        "name": "NIFTY PHARMA",
+        "last": "26,555.85",
+        "percent_change": "-0.51%"
+      },
+      {
+        "name": "NIFTY AUTO",
+        "last": "27,540.95",
+        "percent_change": "-0.41%"
+      }
+    ]
+  },
+  "pib_releases": [
+    {
+      "headline": "India-US trade deal ‘more or less’ finalised, framework for preferential access being worked out: Commer.. - bfsi.economictimes.indiatimes.com",
+      "category": "pib",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "16:40 IST"
+    },
+    {
+      "headline": "SEBI lifts ban on JPMorgan unit Copthall, Mansi over index manipulation charge; CAS restriction stays - Moneycontrol.com",
+      "category": "pib",
+      "score": 6,
+      "source": "GoogleNews",
+      "time": "18:05 IST"
+    }
+  ],
+  "microcap_catalysts": [
+    {
+      "headline": "Dilip Buildcon shares gain 9% after securing LoI for LPG pipeline project - Moneycontrol.com",
+      "category": "microcap",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "07:07 IST"
+    },
+    {
+      "headline": "Dilip Buildcon Limited has received Letter of Intent (LOI) for “Grant of Authorization for Laying, B - BSE India",
+      "category": "microcap",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "11:06 IST"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Press Information Bureau (PIB India)",
+      "label": "PIB Press Releases Portal",
+      "url": "https://www.pib.gov.in"
+    },
+    {
+      "name": "NSE Corporate Announcements",
+      "label": "NSE India Corporate Filings",
+      "url": "https://www.nseindia.com/companies-listing/corporate-filings-announcements"
+    },
+    {
+      "name": "US Department of the Treasury",
+      "label": "US Treasury Rates Portal",
+      "url": "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics"
+    }
+  ],
+  "degraded": false,
+  "missing_sections": []
+}

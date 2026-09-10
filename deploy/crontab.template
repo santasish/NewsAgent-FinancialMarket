@@ -1,0 +1,13 @@
+# Daily market briefing agent — installed by setup_vm.sh
+# CRON_TZ makes the schedule independent of the system clock's timezone.
+CRON_TZ=Asia/Kolkata
+SHELL=/bin/bash
+
+# Morning briefing — 08:00 IST, before the 09:15 open
+0 8 * * * __APP_DIR__/deploy/run_edition.sh morning
+
+# Evening recap — 18:00 IST, after the close and provisional FII/DII publication
+0 18 * * * __APP_DIR__/deploy/run_edition.sh evening
+
+# Refresh the NSE trading-holiday calendar every Sunday at 02:00 IST
+0 2 * * 0 cd __APP_DIR__ && ./.venv/bin/python -m briefing.cli refresh-holidays >> logs/holidays.log 2>&1

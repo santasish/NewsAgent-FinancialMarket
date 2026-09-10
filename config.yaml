@@ -1,0 +1,69 @@
+timezone: Asia/Kolkata
+
+editions:
+  morning:  {time: "08:00", days: all}
+  evening:  {time: "18:00", days: all}
+
+llm:
+  provider: gemini            # gemini | anthropic | openai | stub
+  tiers:
+    # Pinned deliberately: `-latest` aliases would let the model change under a
+    # template-strict pipeline without warning.
+    score:
+      gemini: gemini-3.5-flash-lite
+      anthropic: claude-haiku-4-5-20251001
+      openai: gpt-4o-mini
+    generate:
+      gemini: gemini-3.8-flash
+      anthropic: claude-sonnet-5
+      openai: gpt-4o
+  temperature: 0.2
+  rate_limit:
+    requests_per_minute: 10   # stay under Gemini free-tier RPM
+
+scoring:
+  threshold: 6
+  batch_size: 20
+
+caps:
+  # Keyed by scorer category. An uncapped category keeps everything above the threshold.
+  macro: 4
+  global: 3
+  earnings: 3
+  mna: 4
+  microcap: 3
+  pib: 3
+
+news_queries:
+  earnings: '"Q1 results" OR "Q2 results" OR "Q3 results" OR "Q4 results" OR concall OR "earnings call" OR guidance'
+  special_situations: 'buyback OR demerger OR merger OR "stake sale" OR "open offer" OR amalgamation'
+  microcap: '"order win" OR "bags order" OR "bulk deal" OR "block deal" OR "capacity expansion"'
+  macro_policy: 'RBI OR repo OR inflation OR GDP OR SEBI OR fiscal OR rupee'
+  flows: 'FII OR DII OR "foreign investors" OR "institutional flows"'
+  market_moves: 'Nifty OR Sensex OR "Bank Nifty" OR "crude oil"'
+
+news_domains:
+  - pib.gov.in
+  - rbi.org.in
+  - sebi.gov.in
+  - nseindia.com
+  - bseindia.com
+  - moneycontrol.com
+  - economictimes.indiatimes.com
+  - business-standard.com
+  - livemint.com
+  - reuters.com
+
+verify:
+  # A number in the output must trace back to the payload. See briefing/verify.py.
+  relative_tolerance: 0.001
+  min_magnitude: 100          # bare integers below this are treated as prose, not data
+  max_regenerations: 1
+
+google:
+  # Delivery is by email; these two are the archive log and the calendar reminder.
+  sheet_id: "1AP15p37SHqqCMQDM_371ERg84xuA5spvZk0noFqIWf4"
+  calendar_id: "e1202998ac18a73d9cbae51b890b12f0fda8ac6e98a64adbff32d2fc2bb5b8c7@group.calendar.google.com"
+
+output_dir: out
+raw_dir: raw

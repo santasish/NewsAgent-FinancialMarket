@@ -1,0 +1,17 @@
+PyYAML>=6.0
+python-dotenv>=1.0
+
+# Fetchers
+requests>=2.32
+beautifulsoup4>=4.12
+lxml>=5.0
+feedparser>=6.0
+yfinance>=1.7
+Brotli>=1.1          # NSE serves br-compressed JSON; without this the payloads are unreadable
+
+# LLM provider
+google-genai>=1.0
+
+# Delivery: Sheets archive + Calendar event (the briefing itself goes by email)
+google-api-python-client>=2.0
+google-auth>=2.0

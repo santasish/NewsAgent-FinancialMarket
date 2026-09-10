@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings — CRLF breaks the shebang on Linux
+# ("bad interpreter: /usr/bin/env bash^M").
+*.sh text eol=lf
+crontab.template text eol=lf

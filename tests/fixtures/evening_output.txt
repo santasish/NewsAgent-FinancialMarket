@@ -1,0 +1,54 @@
+Evening Briefing for Thursday, 10 September 2026
+
+HOW THE DAY WENT
+
+Nifty 50 rose 46.30 points or +0.20% to close at 23,477.80, after opening at 23,446.60, dropping to an intraday low of 23,380.10, and reaching a high of 23,494.95. Bank Nifty gained 176.40 points or +0.31% to settle at 56,471.95, moving between 56,231.85 and 56,575.15 from an open of 56,262.75. Both headline gauges managed to finish near their highs of the day after recovering from midday selling.
+
+Market breadth showed that underlying participation remained weak despite the headline rise. For every share that rose, 1.6 fell, with 3,617 shares advancing and 5,903 declining, showing that sellers dominated well beyond the headline index.
+
+Gains were led by Nifty Media, which rose +0.55% to 1,534.80, and Nifty PSU Bank, which added +0.39% to 8,401.85. Those advances were counterbalanced by losses in industrial and export-facing names, with Nifty Metal slipping -0.65% to 13,304.95, Nifty Pharma dropping -0.51% to 26,555.85, and Nifty Auto declining -0.41% to 27,540.95 as higher energy costs and a weaker rupee weighed on sentiment.
+
+WHAT HAPPENED TODAY
+
+Reserve Bank warns lenders on shared tech providers
+
+The Reserve Bank of India warned commercial banks that they cannot outsource the consequence of systems failures when using shared third-party technology providers. This means lenders will have to shoulder direct accountability for operational disruptions, forcing them to spend more on vendor audits, compliance management, and backup infrastructure. Software vendors and cloud infrastructure partners serving multiple banks will face tighter contract terms and rigorous technical reviews, which could lengthen sales cycles. Watch banking stocks tomorrow for any commentary regarding higher operational expenditure.
+
+Dilip Buildcon secures pipeline contract
+
+Dilip Buildcon gained 9% after receiving a letter of intent granting authorization for laying an LPG pipeline. The project provides immediate revenue visibility for the firm and expands its presence in the gas distribution and infrastructure market. Steel pipe manufacturers and local construction contractors stand to benefit from subcontracts and supply orders as procurement begins. Watch Dilip Buildcon at tomorrow's open to see if buyers defend the 9% gain or if quick intraday profit-taking sets in.
+
+WHERE THE MONEY WENT
+
+Foreign investors were net sellers of 582.99 crore of shares, having bought 16,392.90 crore against sales of 16,975.89 crore. Domestic funds like mutual funds and insurers were net buyers of 1,509.04 crore, purchasing 18,130.76 crore against sales of 16,621.72 crore. Indian institutions absorbed overseas selling by more than two to one, keeping the benchmark indices in positive territory. That consistent domestic buying suggests early price drops tomorrow will find institutional support unless overseas sales accelerate significantly.
+
+THE MOOD IN THE OPTIONS MARKET
+
+The market's fear gauge (India VIX) fell -0.20 or -1.71% to close at 11.72, down from an opening level of 11.92 and a previous close of 11.92, after touching a high of 11.96 and a low of 11.53. The slight decline in the fear gauge reflects lower volatility expectations and makes portfolio protection slightly less expensive.
+
+In Nifty options, traders hold far more bets on a rise than on a fall (with a ratio of 0.64), indicating the market is stretched and bounces often start from here. The level where the most traders have bet the index will not climb past is 24,000, while the level the most traders have bet will hold as a floor is 23,000. In Bank Nifty, bets on a rise outnumber bets on a fall (with a ratio of 0.82), with traders setting both the expected ceiling and the expected floor at 57,500.
+
+Stocks where the exchange has frozen new derivative bets because too many positions are already open:
+- Bandhan Bank (BANDHANBNK)
+- INOXWIND
+- KAYNES
+- LICHSGFIN
+- MANAPPURAM
+- SAIL
+
+OVERNIGHT: WHAT COULD MOVE THINGS BEFORE TOMORROW
+
+Overseas equity markets are trading lower this evening. In the US, the S&P 500 is down -0.48% at 7,636.36, the Nasdaq has dropped -0.64% at 26,253.34, and the Dow is off -0.77% at 52,380.66. In Europe, London's FTSE is trading -0.30% lower at 10,638.50, while Frankfurt's DAX is down -0.09% at 25,553.07.
+
+Energy and bond market readings are pointing to higher imported costs. Oil (Brent crude) rose +0.90% to $102.12 a barrel, which raises raw material expenses for tyre and paint makers as well as fuel costs for transport fleets. The interest rate on ten-year US government bonds rose +0.65% to 4.84%, putting pressure on capital flows into emerging markets. The dollar index, which tracks the dollar against other major currencies, edged up +0.02% to 98.79, while the rupee weakened +0.64% to 95.43 to the dollar, raising landed costs for importers of electronic components and machinery while marginally aiding dollar-earning software firms.
+
+Holding overnight long positions in auto makers, tyre manufacturers, and metal producers carries elevated risk tonight because $102.12 oil and a weaker rupee at 95.43 directly squeeze their margins. Conversely, holding aggressive short positions against large public-sector banks or the headline index is risky, because domestic funds continue to absorb sales and the options balance shows a stretched market where sudden bounces regularly develop.
+
+TOMORROW'S LEVELS
+
+At the open, watch today's high of 23,494.95 and low of 23,380.10 for Nifty 50, alongside today's high of 56,575.15 and low of 56,231.85 for Bank Nifty.
+
+SOURCES AND LINKS
+
+- NSE Provisional Equity Reports: NSE Daily Market Activity https://www.nseindia.com/market-data/daily-reports
+- BSE Corporate Filing Announcements: BSE Corporate Disclosures https://www.bseindia.com/corporates/ann.html

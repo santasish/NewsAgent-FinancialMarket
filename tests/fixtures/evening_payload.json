@@ -1,0 +1,194 @@
+{
+  "date": "2026-09-10",
+  "index_data": {
+    "nifty_50": {
+      "close": "23,477.80",
+      "change": "46.30",
+      "percent_change": "+0.20%",
+      "open": "23,446.60",
+      "high": "23,494.95",
+      "low": "23,380.10",
+      "previous_close": "23,431.50"
+    },
+    "bank_nifty": {
+      "close": "56,471.95",
+      "change": "176.40",
+      "percent_change": "+0.31%",
+      "open": "56,262.75",
+      "high": "56,575.15",
+      "low": "56,231.85",
+      "previous_close": "56,295.55"
+    },
+    "india_vix": {
+      "close": "11.72",
+      "change": "-0.20",
+      "percent_change": "-1.71%",
+      "open": "11.92",
+      "high": "11.96",
+      "low": "11.53",
+      "previous_close": "11.92"
+    },
+    "as_of": "10-Sep-2026 15:30"
+  },
+  "market_breadth": {
+    "advances": "3,617",
+    "declines": "5,903",
+    "ratio": "1:1.6",
+    "summary": "sellers dominated well beyond the headline index"
+  },
+  "sector_performance": {
+    "outperforming": [
+      {
+        "name": "NIFTY MEDIA",
+        "last": "1,534.80",
+        "percent_change": "+0.55%"
+      },
+      {
+        "name": "NIFTY PSU BANK",
+        "last": "8,401.85",
+        "percent_change": "+0.39%"
+      },
+      {
+        "name": "NIFTY BANK",
+        "last": "56,471.95",
+        "percent_change": "+0.31%"
+      }
+    ],
+    "underperforming": [
+      {
+        "name": "NIFTY METAL",
+        "last": "13,304.95",
+        "percent_change": "-0.65%"
+      },
+      {
+        "name": "NIFTY PHARMA",
+        "last": "26,555.85",
+        "percent_change": "-0.51%"
+      },
+      {
+        "name": "NIFTY AUTO",
+        "last": "27,540.95",
+        "percent_change": "-0.41%"
+      }
+    ]
+  },
+  "fii_dii_data": {
+    "fii": {
+      "net_crore": "582.99",
+      "direction": "SELLers",
+      "buy_crore": "16,392.90",
+      "sell_crore": "16,975.89",
+      "date": "09-Sep-2026"
+    },
+    "dii": {
+      "net_crore": "1,509.04",
+      "direction": "BUYers",
+      "buy_crore": "18,130.76",
+      "sell_crore": "16,621.72",
+      "date": "09-Sep-2026"
+    }
+  },
+  "derivatives": {
+    "nifty": {
+      "expiry": "15-Sep-2026",
+      "pcr": "0.64",
+      "pcr_assessment": "bets on a rise far outnumber bets on a fall; the market is stretched and bounces often start from here",
+      "call_wall_strike": "24,000",
+      "put_wall_strike": "23,000",
+      "max_pain": "23,500"
+    },
+    "banknifty": {
+      "expiry": "29-Sep-2026",
+      "pcr": "0.82",
+      "pcr_assessment": "bets on a rise outnumber bets on a fall",
+      "call_wall_strike": "57,500",
+      "put_wall_strike": "57,500",
+      "max_pain": "57,500"
+    },
+    "fno_ban": [
+      "BANDHANBNK",
+      "INOXWIND",
+      "KAYNES",
+      "LICHSGFIN",
+      "MANAPPURAM",
+      "SAIL"
+    ]
+  },
+  "macro_data": {
+    "brent_crude": {
+      "last": "102.12",
+      "percent_change": "+0.90%"
+    },
+    "us_10y_yield": {
+      "last": "4.84",
+      "percent_change": "+0.65%"
+    },
+    "dxy": {
+      "last": "98.79",
+      "percent_change": "+0.02%"
+    },
+    "usd_inr": {
+      "last": "95.43",
+      "percent_change": "+0.64%"
+    }
+  },
+  "global_snapshot": {
+    "sp500": {
+      "last": "7,636.36",
+      "percent_change": "-0.48%"
+    },
+    "nasdaq": {
+      "last": "26,253.34",
+      "percent_change": "-0.64%"
+    },
+    "dow": {
+      "last": "52,380.66",
+      "percent_change": "-0.77%"
+    },
+    "ftse": {
+      "last": "10,638.50",
+      "percent_change": "-0.30%"
+    },
+    "dax": {
+      "last": "25,553.07",
+      "percent_change": "-0.09%"
+    }
+  },
+  "filtered_news": [
+    {
+      "headline": "Dilip Buildcon shares gain 9% after securing LoI for LPG pipeline project - Moneycontrol.com",
+      "category": "microcap",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "07:07 IST"
+    },
+    {
+      "headline": "Dilip Buildcon Limited has received Letter of Intent (LOI) for “Grant of Authorization for Laying, B - BSE India",
+      "category": "microcap",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "11:06 IST"
+    },
+    {
+      "headline": "‘Cannot outsource the consequence’: RBI warns banks over shared technology providers - Moneycontrol.com",
+      "category": "pib",
+      "score": 7,
+      "source": "GoogleNews",
+      "time": "12:25 IST"
+    }
+  ],
+  "sources": [
+    {
+      "name": "NSE Provisional Equity Reports",
+      "label": "NSE Daily Market Activity",
+      "url": "https://www.nseindia.com/market-data/daily-reports"
+    },
+    {
+      "name": "BSE Corporate Filing Announcements",
+      "label": "BSE Corporate Disclosures",
+      "url": "https://www.bseindia.com/corporates/ann.html"
+    }
+  ],
+  "degraded": false,
+  "missing_sections": []
+}

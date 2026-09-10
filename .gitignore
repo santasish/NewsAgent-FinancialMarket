@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+out/
+raw/
+credentials*.json
+service_account*.json
+client_secret*.json
+google_token.json
+logs/
+*.log

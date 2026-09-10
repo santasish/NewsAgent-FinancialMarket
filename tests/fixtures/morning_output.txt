@@ -1,0 +1,58 @@
+Morning Briefing for Thursday, 10 September 2026
+
+THE WORLD OVERNIGHT
+
+Major American stock indices closed lower yesterday. The S&P 500 slipped -37.16 to 7,636.36 (-0.48%), the Nasdaq fell -168.07 to 26,253.34 (-0.64%), and the Dow dropped -405.41 to 52,380.66 (-0.77%).
+
+In Asia this morning, the Nikkei rose 128.17 to 65,270.95 (+0.20%), while the Hang Seng dropped -320.49 to 24,954.47 (-1.27%). European markets ended slightly lower in their previous session, with the FTSE down -39.46 to 10,630.64 (-0.37%) and the DAX losing -21.06 to 25,555.39 (-0.08%).
+
+Oil (Brent crude) rose 0.78 (+0.77%) to $101.99 a barrel. The interest rate on ten-year US government bonds climbed 0.03 (+0.65%) to 4.84%. The dollar index, which tracks the dollar against other major currencies, ticked up 0.03 (+0.03%) to 98.80. The rupee weakened by 0.61 (+0.64%) to 95.43 to the dollar. Dearer oil increases fuel bills and raw material expenses for paint, tyre, and transport companies. At the same time, a firmer dollar and higher American bond yields tend to draw global investment away from emerging markets, placing additional pressure on the domestic currency.
+
+The pre-market indicator was not available this morning, so this opening assessment is a reading rather than a quote. With American equities falling, crude oil rising past $101.99 a barrel, and the rupee weakening against the dollar, the market looks set to open below yesterday's close.
+
+WHERE THE BIG MONEY IS LEANING
+
+In index futures, overseas funds hold only 11.0% of their positions as bets on a rise, showing foreign funds are heavily betting on the index falling. When overseas institutions hold such an extensive short stance, intraday advances often struggle to sustain momentum unless sudden domestic buying triggers short covering.
+
+In options expiring on 15-Sep-2026, the level where the most traders have bet the index will not climb past is 24,000, while the level the most traders have bet will hold as a floor is 23,000. Traders hold far more bets on a rise than on a fall (0.64), meaning bets on a rise far outnumber bets on a fall; the market is stretched and bounces often start from here. The level where option sellers would lose the least sits at 23,500.
+
+Stocks where the exchange has frozen new derivative bets because too many positions are already open:
+- Bandhan Bank (BANDHANBNK)
+- INOXWIND
+- KAYNES
+- LIC Housing Finance (LICHSGFIN)
+- Manappuram Finance (MANAPPURAM)
+- Steel Authority of India (SAIL)
+
+SMALLER COMPANIES WORTH A LOOK
+
+Dilip Buildcon received a letter of intent for an LPG pipeline project, and its shares gained 9%. Securing this pipeline laying authorization expands the company's civil construction order book and improves revenue visibility. Carrying out these works also benefits pipe manufacturers and industrial subcontractors partnering on the installations. Watch how the stock trades in the initial minutes, but be cautious of chasing sudden spikes right at the open.
+
+FROM THE GOVERNMENT
+
+The commerce authorities announced that an India-US trade deal is more or less finalised, with a framework for preferential access being worked out. Securing preferential market access provides direct tariff relief for Indian exporters in textiles, auto parts, and engineering goods competing against regional peers. Over time, higher trade receipts can also support rupee stability. Watch export-oriented manufacturing firms for active interest today.
+
+The market regulator SEBI lifted its ban on JPMorgan unit Copthall and Mansi regarding index manipulation charges, while keeping client code modification restrictions in place. Removing the trading prohibition allows these institutional entities to resume normal activity, helping institutional brokerages restore standard order flows. Watch large index shares and institutional turnover patterns following the regulatory decision.
+
+YESTERDAY'S WINNERS AND LOSERS
+
+In yesterday's trading, Nifty Media led the sector gainers with an increase of +0.55% to 1,534.80, followed by Nifty PSU Bank which added +0.39% to 8,401.85, and Nifty Bank which rose +0.31% to 56,471.95. On the lagging side, Nifty Metal dropped -0.65% to 13,304.95, Nifty Pharma fell -0.51% to 26,555.85, and Nifty Auto declined -0.41% to 27,540.95. This movement shows institutional capital shifting toward state-owned lenders and domestic media while paring exposure to metal producers and export-linked automakers.
+
+THE PLAN FOR TODAY
+
+Nifty 50 closed yesterday at 23,477.80. If it climbs, the first hurdle is 23,521.80 and the next is 23,565.80. If it slips, the first cushion is 23,406.95 and then 23,336.10. It sits below both its 20-day and 50-day averages, so the falling trend is intact against its 20-day average of 24,027.20 and 50-day average of 24,170.87. Traders should watch whether 23,406.95 holds on initial dips, as a break below that mark opens the way toward 23,336.10.
+
+Bank Nifty closed at 56,471.95. If it climbs, the first hurdle is 56,620.78 and the next is 56,769.61. If it slips, the first cushion is 56,277.48 and then 56,083.02. It sits below both its 20-day and 50-day averages, so the falling trend is intact against its 20-day average of 57,328.46 and 50-day average of 57,490.19. Track whether banking shares can defend the 56,277.48 cushion during early trading to gauge if yesterday's strength persists.
+
+Worth watching for a rise:
+- Dilip Buildcon: shares reacted positively after securing a letter of intent for an LPG pipeline project.
+
+Worth watching for a fall, or avoiding:
+- Steel Authority of India (SAIL): metal shares lagged yesterday and new derivative bets remain frozen by the exchange.
+- Bandhan Bank (BANDHANBNK): new derivative bets remain frozen after positions crossed exchange limits.
+
+SOURCES AND LINKS
+
+- Press Information Bureau (PIB India): PIB Press Releases Portal https://www.pib.gov.in
+- NSE Corporate Announcements: NSE India Corporate Filings https://www.nseindia.com/companies-listing/corporate-filings-announcements
+- US Department of the Treasury: US Treasury Rates Portal https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics
