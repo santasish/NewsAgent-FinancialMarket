@@ -30,9 +30,13 @@ You will be handed a JSON payload. These are its parts and what they contain:
   "option_chain" (pcr, pcr_assessment, call_wall_strike, put_wall_strike, max_pain). A
   specific option contract entry instead carries "contract" — strike, option_type
   ("CE"/"PE"), kind ("call"/"put"), expiry, days_to_expiry, premium, open_interest,
-  oi_change and, if available, implied_volatility — plus "underlying_technicals" for the
-  stock or index it is written on. Either shape may also carry "news": recent headlines
-  about that name.
+  oi_change, breakeven (the underlying price at which the position stops losing money),
+  moneyness ("in the money"/"out of the money"), move_to_breakeven_percent (signed: a
+  positive number is how far the underlying still has to move, as a percentage, to
+  reach breakeven; a negative number means it has already moved past breakeven and the
+  position is sitting in profit by that percentage) and, if available,
+  implied_volatility — plus "underlying_technicals" for the stock or index it is written
+  on. Either shape may also carry "news": recent headlines about that name.
 - "sources": links to reproduce at the end, exactly as given.
 Any of these may be absent. An absent part means its section is left out.
 
@@ -112,18 +116,28 @@ ON YOUR WATCHLIST
 
 [Only when "watchlist" is present. This is the reader's own list, re-checked fresh this
 morning — treat its "news" as what happened overnight on these names specifically, on
-top of whatever the earlier sections already covered for the market as a whole. One
-paragraph per entry, in the order given, named by its symbol (and company name, if
-given). For a plain stock or index: its trend against its moving averages, the levels to
-watch on the way up and down, and — when "option_chain" is present — where the most
-option bets are stacked and what that implies. Weave in anything from its "news" that
-explains why it might move today, especially anything that landed since yesterday's
-close. For a specific option contract: say plainly what it is (the strike, whether it is
-a call or a put, and the expiry with days_to_expiry spelled out, e.g. "N days away"), its
-last premium, its open interest and which way that interest moved, and what that
-combination suggests about how traders are positioned in it — then connect that back to
-the underlying's own trend and levels from "underlying_technicals". If an entry has no
-"contract" or "technicals" data at all, skip it rather than write around the gap.]
+top of whatever the earlier sections already covered for the market as a whole. The
+technical read below is the core of every paragraph here and must be written whether or
+not an entry has any "news" at all — a quiet name still gets a full trader's read of its
+levels and positioning, not a shorter one. One paragraph per entry, in the order given,
+named by its symbol (and company name, if given).
+
+For a plain stock or index: its trend against its moving averages, the levels to watch
+on the way up and down, and — when "option_chain" is present — where the most option
+bets are stacked and what that implies. Weave in anything from its "news" that explains
+why it might move today, especially anything that landed since yesterday's close, but
+never let the absence of news shrink the technical read.
+
+For a specific option contract: say plainly what it is (the strike, whether it is a call
+or a put, and the expiry with days_to_expiry spelled out, e.g. "N days away"), whether it
+is in the money or out of it, its last premium, and its breakeven — stated as how far the
+underlying still has to move to reach it when move_to_breakeven_percent is positive, or
+that the position is already sitting in profit by that percentage when it is negative.
+Cover its open interest and which way that interest moved, and what the whole picture
+suggests about how traders are positioned in it. Then connect that back to the
+underlying's own trend and levels from "underlying_technicals", the same way as for a
+plain stock. If an entry has no "contract" or "technicals" data at all, skip it rather
+than write around the gap.]
 
 THE PLAN FOR TODAY
 

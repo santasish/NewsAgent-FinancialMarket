@@ -199,9 +199,13 @@ def watchlist_block(raw: list[dict[str, Any]], day: date) -> list[dict[str, Any]
                 "open_interest": num(contract["open_interest"], 0),
                 "oi_change": num(contract["oi_change"], 0),
                 "underlying_last": num(contract["underlying"]),
+                "breakeven": num(contract["breakeven"]),
+                "moneyness": contract["moneyness"],
             }
             if contract.get("implied_volatility") is not None:
                 shaped["contract"]["implied_volatility"] = num(contract["implied_volatility"])
+            if contract.get("move_to_breakeven_percent") is not None:
+                shaped["contract"]["move_to_breakeven_percent"] = pct(contract["move_to_breakeven_percent"])
         if item.get("underlying_technicals"):
             shaped["underlying_technicals"] = levels_block(item["underlying_technicals"])
 

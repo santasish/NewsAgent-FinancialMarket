@@ -169,6 +169,34 @@ class ContractSnapshotTests(unittest.TestCase):
         chain["rows"][0]["call_ltp"] = None
         self.assertIsNone(contract_snapshot(chain, 4700.0, "CE"))
 
+    def test_out_of_the_money_call_still_needs_to_rise(self):
+        # strike 4700, underlying 4550: not yet past the strike, breakeven is even higher.
+        snapshot = contract_snapshot(self.chain(), 4700.0, "CE")
+        self.assertEqual(snapshot["breakeven"], 4742.5)
+        self.assertEqual(snapshot["moneyness"], "out of the money")
+        self.assertGreater(snapshot["move_to_breakeven_percent"], 0)
+
+    def test_call_already_past_breakeven_is_negative(self):
+        chain = self.chain()
+        chain["underlying"] = 4800.0  # above breakeven (4742.5): already in profit
+        snapshot = contract_snapshot(chain, 4700.0, "CE")
+        self.assertEqual(snapshot["moneyness"], "in the money")
+        self.assertLess(snapshot["move_to_breakeven_percent"], 0)
+
+    def test_put_still_needs_to_fall_is_positive_even_though_in_the_money(self):
+        # strike 4700, underlying 4550 is below the strike (in the money by strike terms)
+        # but above the 4520 breakeven, so the position is not yet profitable.
+        snapshot = contract_snapshot(self.chain(), 4700.0, "PE")
+        self.assertEqual(snapshot["breakeven"], 4520.0)
+        self.assertEqual(snapshot["moneyness"], "in the money")
+        self.assertGreater(snapshot["move_to_breakeven_percent"], 0)
+
+    def test_put_past_breakeven_is_negative(self):
+        chain = self.chain()
+        chain["underlying"] = 4400.0  # below breakeven (4520): already in profit
+        snapshot = contract_snapshot(chain, 4700.0, "PE")
+        self.assertLess(snapshot["move_to_breakeven_percent"], 0)
+
 
 class WatchlistBlockTests(unittest.TestCase):
     def test_stock_entry_carries_technicals_and_news(self):
@@ -201,6 +229,8 @@ class WatchlistBlockTests(unittest.TestCase):
                 "strike": 4700.0, "option_type": "CE", "kind": "call", "expiry": "29-Sep-2026",
                 "premium": 42.5, "open_interest": 5000, "oi_change": 300,
                 "implied_volatility": 24.1, "underlying": 4550.0,
+                "breakeven": 4742.5, "moneyness": "out of the money",
+                "move_to_breakeven_percent": 4.23,
             },
             "underlying_technicals": {
                 "reference_session": "09-Sep-2026", "reference_close": 4550.0,
@@ -214,6 +244,9 @@ class WatchlistBlockTests(unittest.TestCase):
         self.assertEqual(entry["contract"]["days_to_expiry"], 19)
         self.assertEqual(entry["contract"]["premium"], "42.50")
         self.assertEqual(entry["contract"]["kind"], "call")
+        self.assertEqual(entry["contract"]["breakeven"], "4,742.50")
+        self.assertEqual(entry["contract"]["moneyness"], "out of the money")
+        self.assertEqual(entry["contract"]["move_to_breakeven_percent"], "+4.23%")
         self.assertNotIn("news", entry)
 
     def test_entry_with_nothing_usable_is_dropped(self):

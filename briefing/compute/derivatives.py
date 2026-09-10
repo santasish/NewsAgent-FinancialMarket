@@ -98,10 +98,31 @@ def contract_snapshot(chain: dict[str, Any], strike: float, option_type: str) ->
     if premium is None:
         return None
 
+    underlying = chain.get("underlying")
+    # Precomputed so the model states a trader's read (breakeven, how far the underlying
+    # has to move) without doing arithmetic itself — that would let it invent a figure
+    # the verifier can't check. A call needs the underlying above the breakeven at
+    # expiry to be in profit; a put needs it below.
+    is_call = option_type == "CE"
+    breakeven = round(strike + premium, 2) if is_call else round(strike - premium, 2)
+    moneyness = None
+    move_to_breakeven_percent = None
+    if underlying:
+        moneyness = (
+            "in the money" if (underlying > strike if is_call else underlying < strike)
+            else "out of the money"
+        )
+        # Signed so the reader can tell direction from the number alone: positive means
+        # the underlying still has to move that far (up for a call, down for a put) to
+        # reach breakeven; negative means it has already moved past it and the position
+        # is sitting in profit by that percentage.
+        signed_distance = (breakeven - underlying) if is_call else (underlying - breakeven)
+        move_to_breakeven_percent = round(signed_distance / underlying * 100, 2)
+
     return {
         "symbol": chain.get("symbol"),
         "expiry": chain.get("expiry"),
-        "underlying": chain.get("underlying"),
+        "underlying": underlying,
         "strike": strike,
         "option_type": option_type,
         "kind": "call" if option_type == "CE" else "put",
@@ -109,4 +130,7 @@ def contract_snapshot(chain: dict[str, Any], strike: float, option_type: str) ->
         "open_interest": row.get(f"{prefix}_oi"),
         "oi_change": row.get(f"{prefix}_oi_change"),
         "implied_volatility": row.get(f"{prefix}_iv"),
+        "breakeven": breakeven,
+        "moneyness": moneyness,
+        "move_to_breakeven_percent": move_to_breakeven_percent,
     }
