@@ -11,9 +11,13 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from briefing.compute import analyse_option_chain, compute_levels, contract_snapshot
 from briefing.config import Config
 from briefing.dedup import headline_key, load_seen, record_seen
+from briefing.deliver.gsheets import read_watchlist
 from briefing.fetch import news as news_fetch
+from briefing.fetch import nse as nse_fetch
+from briefing.fetch import watchlist as watchlist_fetch
 from briefing.fetch.base import FetchResult, save_raw
 from briefing.filter import apply_caps, rule_filter, score_items
 from briefing.generate import generate
@@ -91,6 +95,79 @@ def gather_news(
     return flattened, scored
 
 
+def gather_watchlist(config: Config, day: date) -> list[dict[str, Any]]:
+    """Fetch technicals, options data and news for the day's watchlist, if any is set.
+
+    Entirely optional and best-effort: no Sheet configured, an empty Watchlist tab, or
+    any fetch failing along the way just means fewer (or zero) entries, never a failed
+    run — this is a bonus section, not a source the rest of the briefing depends on.
+    """
+    sheet_id = config.get("google.sheet_id", "")
+    if not sheet_id:
+        return []
+    try:
+        entries = read_watchlist(sheet_id)
+    except Exception:
+        return []
+    if not entries:
+        return []
+
+    max_symbols = config.get("watchlist.max_symbols", 8)
+    entries = entries[:max_symbols]
+
+    symbols = sorted({e["symbol"] for e in entries})
+    quotes_result = watchlist_fetch.fetch_watchlist_quotes(symbols)
+    quotes = quotes_result.data if quotes_result.ok else {}
+
+    session = nse_fetch.NSESession()
+    chain_cache: dict[tuple[str, str | None], Any] = {}
+
+    def chain_for(symbol: str, expiry: str | None) -> dict[str, Any] | None:
+        key = (symbol, expiry)
+        if key not in chain_cache:
+            result = nse_fetch.fetch_option_chain(session, symbol, expiry=expiry)
+            chain_cache[key] = result.data if result.ok else None
+        return chain_cache[key]
+
+    news_queries = {f"watchlist::{e['symbol']}": f"\"{e.get('name') or e['symbol']}\"" for e in entries}
+    news_result = news_fetch.fetch_news(domains=config.get("news_domains"), queries=news_queries)
+    news_by_symbol: dict[str, list[dict[str, Any]]] = {}
+    if news_result.ok:
+        for item in news_result.data:
+            topic = item.get("topic", "")
+            if topic.startswith("watchlist::"):
+                news_by_symbol.setdefault(topic.split("::", 1)[1], []).append(item)
+
+    out: list[dict[str, Any]] = []
+    for entry in entries:
+        symbol = entry["symbol"]
+        history = quotes.get(symbol, [])
+        levels = compute_levels(history) if history else None
+        item_news = news_by_symbol.get(symbol, [])[:4]
+
+        if "strike" in entry:
+            chain = chain_for(symbol, entry["expiry"])
+            snapshot = contract_snapshot(chain, entry["strike"], entry["option_type"]) if chain else None
+            out.append({
+                "symbol": symbol,
+                "name": entry.get("name"),
+                "contract": snapshot,
+                "underlying_technicals": levels,
+                "news": item_news,
+            })
+        else:
+            chain = chain_for(symbol, None)
+            analysis = analyse_option_chain(chain) if chain else None
+            out.append({
+                "symbol": symbol,
+                "name": entry.get("name"),
+                "technicals": levels,
+                "option_chain": analysis,
+                "news": item_news,
+            })
+    return out
+
+
 def run_pipeline(
     config: Config,
     provider: Provider,
@@ -118,7 +195,11 @@ def run_pipeline(
         if result is not None and not result.ok:
             ctx.missing.append(plain_name)
 
-    payload = BUILDERS[prompt_name](ctx, day, news)
+    if prompt_name in ("morning", "evening"):
+        watchlist = gather_watchlist(config, day)
+        payload = BUILDERS[prompt_name](ctx, day, news, watchlist=watchlist)
+    else:
+        payload = BUILDERS[prompt_name](ctx, day, news)
 
     save_raw(fetches, Path(config.get("raw_dir", "raw")), f"{day.isoformat()}_{prompt_name}")
     out_dir.mkdir(parents=True, exist_ok=True)

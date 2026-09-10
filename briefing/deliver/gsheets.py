@@ -23,6 +23,13 @@ ISSUES_TAB = "Issues"
 ISSUES_HEADER = ["Date", "Edition", "Text"]
 ISSUES_RANGE = f"{ISSUES_TAB}!A:C"
 
+# A row is either a plain stock/index (Strike/Type/Expiry blank) or one specific option
+# contract (all three filled). "Company Name" is only there to sharpen the news search;
+# the symbol alone is what every fetch keys off.
+WATCHLIST_TAB = "Watchlist"
+WATCHLIST_HEADER = ["Symbol", "Strike", "Type", "Expiry", "Company Name"]
+WATCHLIST_RANGE = f"{WATCHLIST_TAB}!A2:E"
+
 # A cell tops out at 50,000 characters; a real issue runs a few thousand. This is a
 # guard against something going very wrong upstream, not a limit expected in practice.
 MAX_CELL_CHARS = 49_000
@@ -117,3 +124,69 @@ def append_issue(sheet_id: str, *, date: str, edition: str, text: str) -> str:
     updated_range = response["updates"]["updatedRange"]
     cell_ref = updated_range.split("!", 1)[1].split(":", 1)[0]
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit#gid={tab_id}&range={cell_ref}"
+
+
+@lru_cache(maxsize=8)
+def _ensure_watchlist_tab(sheet_id: str) -> None:
+    """Create the Watchlist tab with its header the first time it is needed.
+
+    Cached per spreadsheet so a run only pays for the lookup once, same as the Issues
+    tab above.
+    """
+    sheets = service("sheets", "v4")
+    meta = sheets.spreadsheets().get(spreadsheetId=sheet_id, fields="sheets.properties").execute()
+    for sheet in meta.get("sheets", []):
+        if sheet["properties"]["title"] == WATCHLIST_TAB:
+            return
+
+    sheets.spreadsheets().batchUpdate(
+        spreadsheetId=sheet_id,
+        body={"requests": [{"addSheet": {"properties": {"title": WATCHLIST_TAB}}}]},
+    ).execute()
+    sheets.spreadsheets().values().update(
+        spreadsheetId=sheet_id,
+        range=f"{WATCHLIST_TAB}!A1:E1",
+        valueInputOption="RAW",
+        body={"values": [WATCHLIST_HEADER]},
+    ).execute()
+
+
+def read_watchlist(sheet_id: str) -> list[dict]:
+    """The day's watchlist rows, parsed into plain stocks/indices and option contracts.
+
+    A row with Strike, Type and Expiry all filled is a specific option contract; any
+    other combination is treated as a plain stock or index (those three columns are
+    ignored). A malformed option row (a non-numeric strike, say) is dropped rather than
+    guessed at — see SPEC.md's zero-fabrication rule.
+    """
+    _ensure_watchlist_tab(sheet_id)
+    rows = (
+        service("sheets", "v4")
+        .spreadsheets()
+        .values()
+        .get(spreadsheetId=sheet_id, range=WATCHLIST_RANGE)
+        .execute()
+        .get("values", [])
+    )
+
+    out: list[dict] = []
+    for row in rows:
+        cells = (row + [""] * 5)[:5]
+        symbol = cells[0].strip().upper()
+        if not symbol:
+            continue
+        entry: dict = {"symbol": symbol}
+        if cells[4].strip():
+            entry["name"] = cells[4].strip()
+
+        strike_raw, type_raw, expiry_raw = cells[1].strip(), cells[2].strip().upper(), cells[3].strip()
+        if strike_raw and type_raw and expiry_raw:
+            try:
+                entry["strike"] = float(strike_raw)
+            except ValueError:
+                continue
+            entry["option_type"] = "CE" if type_raw.startswith("C") else "PE"
+            entry["expiry"] = expiry_raw
+
+        out.append(entry)
+    return out

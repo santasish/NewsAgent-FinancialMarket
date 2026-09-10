@@ -79,3 +79,34 @@ def analyse_option_chain(chain: dict[str, Any]) -> dict[str, Any] | None:
         "total_call_oi": total_call_oi,
         "total_put_oi": total_put_oi,
     }
+
+
+def contract_snapshot(chain: dict[str, Any], strike: float, option_type: str) -> dict[str, Any] | None:
+    """The one row a watchlist entry asked for: its premium, OI and which way OI moved.
+
+    `option_type` is "CE" or "PE". Returns None if the strike isn't in the fetched
+    chain or the contract has no trades (no last price) — printing a blank premium
+    would violate the zero-fabrication rule just as much as inventing one.
+    """
+    rows = chain.get("rows") or []
+    row = next((r for r in rows if r.get("strike") == strike), None)
+    if not row:
+        return None
+
+    prefix = "call" if option_type == "CE" else "put"
+    premium = row.get(f"{prefix}_ltp")
+    if premium is None:
+        return None
+
+    return {
+        "symbol": chain.get("symbol"),
+        "expiry": chain.get("expiry"),
+        "underlying": chain.get("underlying"),
+        "strike": strike,
+        "option_type": option_type,
+        "kind": "call" if option_type == "CE" else "put",
+        "premium": premium,
+        "open_interest": row.get(f"{prefix}_oi"),
+        "oi_change": row.get(f"{prefix}_oi_change"),
+        "implied_volatility": row.get(f"{prefix}_iv"),
+    }

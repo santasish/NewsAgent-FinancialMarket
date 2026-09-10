@@ -27,6 +27,7 @@ newsletter prose (see §1a). Supersedes the raw notes pasted into chat.
 | Alerting | Email on failure + `DEGRADED` banner at top of any briefing with missing sections |
 | Fabrication check | Code-level: every number and ticker in output must exist in payload; else regenerate once, then flag |
 | Review gate | Zero-touch from day one |
+| Watchlist (added 2026-09-10) | User-supplied, day-to-day list of stocks/indices or specific option contracts, read from a "Watchlist" tab in the archive Sheet on every morning and evening run. Empty tab = no section, no extra cost. |
 
 ### Non-negotiables
 1. Zero fabrication — omit rather than guess. Enforced in prompt AND in code.
@@ -70,15 +71,16 @@ Sections, in order (headings as printed):
 7. SMALLER COMPANIES WORTH A LOOK — orders, block deals, capacity
 8. FROM THE GOVERNMENT — PIB, RBI, SEBI releases
 9. YESTERDAY'S WINNERS AND LOSERS — sector leaders and laggards
-10. THE PLAN FOR TODAY — Nifty and Bank Nifty levels in plain words, watchlists
-11. SOURCES AND LINKS
+10. ON YOUR WATCHLIST — only when the user has entries in the Watchlist Sheet tab; per-stock technicals and news, or a specific option contract's premium/OI (see §3)
+11. THE PLAN FOR TODAY — Nifty and Bank Nifty levels in plain words, watchlists
+12. SOURCES AND LINKS
 
 Weekend variant (`weekend_morning.txt`): THE WORLD WHILE INDIA WAS CLOSED · NEWS THAT LANDED · DEALS AND ANNOUNCEMENTS · FROM THE GOVERNMENT · CARRY THIS INTO [next session] · SOURCES AND LINKS.
 
 ### 2.2 Evening Edition — 06:00 PM IST (daily)
 Purpose: post-mortem & position adjustment. Window: 09:15 – 17:45 IST.
 
-Sections (headings as printed): HOW THE DAY WENT · WHAT HAPPENED TODAY · WHERE THE MONEY WENT · THE MOOD IN THE OPTIONS MARKET · FILED AFTER THE BELL · OVERNIGHT: WHAT COULD MOVE THINGS BEFORE TOMORROW · TOMORROW'S LEVELS · SOURCES AND LINKS.
+Sections (headings as printed): HOW THE DAY WENT · WHAT HAPPENED TODAY · WHERE THE MONEY WENT · THE MOOD IN THE OPTIONS MARKET · FILED AFTER THE BELL · OVERNIGHT: WHAT COULD MOVE THINGS BEFORE TOMORROW · ON YOUR WATCHLIST (only when the Watchlist Sheet tab has entries — see §3) · TOMORROW'S LEVELS · SOURCES AND LINKS.
 
 Weekend variant (`weekend_evening.txt`): WHERE THE WORLD STANDS · WHAT CAME IN OVER THE BREAK · THEMES FOR THE WEEK FROM [next session] · SOURCES AND LINKS.
 
@@ -108,6 +110,10 @@ Verified against live endpoints on 2026-09-10. ✅ = working, ⚠ = degraded.
 | PCR, call/put walls, max pain | computed locally | from the fetched option chains | ✅ |
 | Breadth ratio, sector leaders/laggards | computed locally | from `allIndices` | ✅ |
 | FII index-futures long ratio | computed locally | from participant OI | ✅ |
+| Watchlist entries (symbol list) | Google Sheets | "Watchlist" tab, columns Symbol/Strike/Type/Expiry/Company Name; auto-created like the Issues tab | ✅ |
+| Watchlist stock/index technicals | yfinance | batched download for the day's symbols (`SYMBOL.NS`), same pivots/DMA as §3 above | ✅ |
+| Watchlist option contract (specific strike) | NSE | same option-chain-v3 call as the index chains, generalised with `type=Stock` for single names and an `expiry` match | ✅ (F&O names only) |
+| Watchlist company news | Google News RSS | one query per entry (`"<company name or symbol>"`), shown regardless of the scorer's threshold | ✅ |
 
 **Delivery decision, revised 2026-09-10 — Google Docs dropped, email is the channel.**
 

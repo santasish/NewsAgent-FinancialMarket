@@ -137,6 +137,82 @@ def shape_news(item: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in shaped.items() if v is not None}
 
 
+def levels_block(levels: dict[str, Any]) -> dict[str, Any]:
+    """Pre-formatted pivots/DMAs/trend, shared by the index levels and watchlist sections."""
+    pivots = levels["pivots"]
+    return {
+        "reference_session": levels["reference_session"],
+        "reference_close": num(levels["reference_close"]),
+        "r1": num(pivots["r1"]),
+        "r2": num(pivots["r2"]),
+        "pivot": num(pivots["pivot"]),
+        "s1": num(pivots["s1"]),
+        "s2": num(pivots["s2"]),
+        "dma_20": num(levels["dma_20"]),
+        "dma_50": num(levels["dma_50"]),
+        "trend": levels["trend"],
+    }
+
+
+def watchlist_block(raw: list[dict[str, Any]], day: date) -> list[dict[str, Any]]:
+    """Shape gathered watchlist data into the pre-formatted numbers the prompt prints.
+
+    Each entry from `briefing.pipeline.gather_watchlist` is either a plain stock/index
+    (has "technicals") or a specific option contract (has "contract"); either may also
+    carry "news". An entry that resolved to nothing usable is dropped here rather than
+    left for the model to notice — an empty entry would invite it to write around the
+    gap instead of just omitting it. Shared by the morning and evening editions.
+    """
+    out: list[dict[str, Any]] = []
+    for item in raw:
+        shaped: dict[str, Any] = {"symbol": item["symbol"]}
+        if item.get("name"):
+            shaped["name"] = item["name"]
+
+        if item.get("technicals"):
+            shaped["technicals"] = levels_block(item["technicals"])
+        oc = item.get("option_chain")
+        if oc:
+            shaped["option_chain"] = {
+                "expiry": oc["expiry"],
+                "pcr": num(oc["pcr"]),
+                "pcr_assessment": oc["pcr_assessment"],
+                "call_wall_strike": num(oc["call_wall"], 0),
+                "put_wall_strike": num(oc["put_wall"], 0),
+                "max_pain": num(oc["max_pain"], 0),
+            }
+
+        contract = item.get("contract")
+        if contract:
+            expiry_date = None
+            try:
+                expiry_date = datetime.strptime(contract["expiry"], "%d-%b-%Y").date()
+            except (ValueError, KeyError):
+                pass
+            shaped["contract"] = {
+                "strike": num(contract["strike"], 0),
+                "option_type": contract["option_type"],
+                "kind": contract["kind"],
+                "expiry": contract["expiry"],
+                "days_to_expiry": (expiry_date - day).days if expiry_date else None,
+                "premium": num(contract["premium"]),
+                "open_interest": num(contract["open_interest"], 0),
+                "oi_change": num(contract["oi_change"], 0),
+                "underlying_last": num(contract["underlying"]),
+            }
+            if contract.get("implied_volatility") is not None:
+                shaped["contract"]["implied_volatility"] = num(contract["implied_volatility"])
+        if item.get("underlying_technicals"):
+            shaped["underlying_technicals"] = levels_block(item["underlying_technicals"])
+
+        if item.get("news"):
+            shaped["news"] = [shape_news(n) for n in item["news"]]
+
+        if len(shaped) > (2 if "name" in shaped else 1):
+            out.append(shaped)
+    return out
+
+
 @dataclass
 class PayloadContext:
     """Carries fetch results and records which sections had to be dropped."""

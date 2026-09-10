@@ -346,6 +346,15 @@ def cmd_check_google(args: argparse.Namespace) -> int:
         except Exception as exc:
             problems += 1
             print(f"[FAIL] sheet           {type(exc).__name__}: {str(exc)[:120]}")
+
+        try:
+            from briefing.deliver.gsheets import read_watchlist
+
+            entries = read_watchlist(sheet_id)
+            names = ", ".join(e["symbol"] for e in entries) or "(empty)"
+            print(f"[OK  ] watchlist       {len(entries)} entries: {names}")
+        except Exception as exc:
+            print(f"[----] watchlist       could not read the Watchlist tab: {str(exc)[:120]}")
     else:
         print("[----] sheet           not configured (google.sheet_id)")
 

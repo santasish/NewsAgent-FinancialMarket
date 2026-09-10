@@ -15,6 +15,7 @@ from briefing.payload.common import (
     pct,
     shape_news,
     side,
+    watchlist_block,
 )
 
 
@@ -37,6 +38,7 @@ def build_evening_payload(
     ctx: PayloadContext,
     day: date,
     news: list[dict[str, Any]],
+    watchlist: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {"date": day.isoformat()}
 
@@ -123,6 +125,11 @@ def build_evening_payload(
         payload["filtered_news"] = intraday
     if after_hours:
         payload["after_hours_filings"] = after_hours
+
+    if watchlist:
+        shaped_watchlist = watchlist_block(watchlist, day)
+        if shaped_watchlist:
+            payload["watchlist"] = shaped_watchlist
 
     payload["sources"] = [SOURCES["nse_daily"], SOURCES["bse_filings"]]
     return ctx.finish(payload)
