@@ -19,9 +19,9 @@ newsletter prose (see §1a). Supersedes the raw notes pasted into chat.
 | Pivots / DMA | Computed locally: classic pivot formula from previous session H/L/C; 20/50-DMA from OHLC history |
 | LLM | Provider-agnostic adapter. Default: Google Gemini free tier (2.5 Flash-Lite = scoring, 2.5 Flash = generation). Anthropic / OpenAI adapters kept as paid upgrades. |
 | Impact depth | Three layers (immediate effect, knock-on to related firms, wider economy and flows) for macro and index-level items; two for company-level items. Written as prose; the layers are never labelled. |
-| Scoring gate | Category-aware: score 0–10 + label {macro, earnings, mna, microcap, pib, global}; keep score >= 7 |
+| Scoring gate | Category-aware: score 0–10 + label {macro, earnings, mna, microcap, pib, global}; keep score >= 6 |
 | Budget | $0 / month. Everything on free tiers. |
-| Hosting | Oracle Cloud Always-Free VM (Mumbai region), system cron in IST |
+| Hosting | GitHub Actions scheduled workflow (revised 2026-09-10 — see below; Oracle Always-Free sign-up did not succeed) |
 | Google auth | Service account; Drive folder, Sheet and Calendar shared to it |
 | Repo shape | Single Python package, one CLI: `briefing run --edition morning|evening` |
 | Alerting | Email on failure + `DEGRADED` banner at top of any briefing with missing sections |
@@ -328,7 +328,7 @@ Oracle VM, or the user's own machine. Do not revisit unless the egress policy ch
 | 3. Generation ✅ | 4 payload builders, pipeline orchestration, `run` wired to live data, Gemini adapter with token accounting | Morning and evening both generate from live data and verify clean (75 and 71 numbers traceable in the plain-prose versions); 56 tests pass |
 | 3a. Rewrite ✅ | Addendum removed; plain-newsletter prompts; scorer subject rule and source tags; optional sources; heading-based Telegram/email layout; fixtures refreshed from live output | Both editions read as prose with no order labels or acronyms, and verify clean |
 | 4. Verify + Deliver ◐ | verifier ✅, missing-data note ✅, Telegram + email + Sheets + Calendar + alerts built; Sheets and Calendar verified | **Remaining: no delivery channel is configured in `.env` — fill in Telegram or Gmail.** |
-| 5. Schedule ◐ | Bootstrap + cron wrapper + schedule + DEPLOY.md written and syntax-checked | Scripts verified locally (bash -n, marker-based crontab replacement, LF endings enforced by .gitattributes). **Remaining: run on the actual VM — 7 consecutive hands-free days.** |
+| 5. Schedule ◐ | Oracle VM path built (bootstrap, cron wrapper, DEPLOY.md) but sign-up did not go through; pivoted to a GitHub Actions workflow instead — see `deploy/GITHUB_ACTIONS.md` and `.github/workflows/briefing.yml` | Workflow written: two daily schedules plus a weekly holiday-calendar refresh that commits itself back. Oracle scripts kept as a documented fallback, not deleted. **Remaining: confirm the schedule actually fires unattended for a few days once secrets are in place.** |
 | 6. Hardening | retries, raw snapshot archiving, cost logging, prompt tuning from real outputs | you sign off on output quality |
 
 ---

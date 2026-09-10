@@ -1,6 +1,6 @@
 # Daily Market Briefing Agent
 
-Automated morning / evening / US-open briefings on Indian equity markets.
+Automated morning and evening briefings on Indian equity markets.
 Design decisions and the build plan live in [SPEC.md](SPEC.md).
 
 ## Setup
@@ -59,6 +59,11 @@ over Telegram and/or Gmail with a Sheets archive row and a Calendar event.
 BSE and GIFT Nifty are optional sources: they rarely work from outside India and their
 absence never marks a run as degraded.
 
-Remaining: fill in a delivery channel in `.env` (`TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`,
-or `ALERT_EMAIL_FROM/TO` + `GMAIL_APP_PASSWORD`), then deploy to the Oracle VM per
-[deploy/DEPLOY.md](deploy/DEPLOY.md) and watch the first week in the archive Sheet.
+Deployed as a GitHub Actions scheduled workflow (`.github/workflows/briefing.yml`) rather
+than the Oracle VM originally planned — Oracle sign-up did not go through. See
+[deploy/GITHUB_ACTIONS.md](deploy/GITHUB_ACTIONS.md) for the secrets to add and how it
+runs. The Oracle path (`deploy/DEPLOY.md`) is kept as a documented fallback.
+
+Remaining: confirm a delivery channel is actually working end to end (run
+`check-google --test-alert` above) and watch the archive Sheet for the first few
+unattended days once the GitHub secrets are in place.
