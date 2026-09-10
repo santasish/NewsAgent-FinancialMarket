@@ -76,6 +76,22 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+      # This runner is thrown away after the job, so without committing it back, the
+      # evening run could never see which headlines this morning's run already used —
+      # see briefing/dedup.py. A quiet day with nothing new produces no diff, and the
+      # commit is skipped rather than failing on "nothing to commit".
+      - name: Commit today's headline record
+        if: always() && (env.EDITION == 'morning' || env.EDITION == 'evening')
+        run: |
+          git config user.name "briefing-bot"
+          git config user.email "actions@users.noreply.github.com"
+          mkdir -p state
+          git add state/
+          if ! git diff --cached --quiet; then
+            git commit -m "Record ${EDITION} headlines for $(date -u +%F)" -q
+            git push
+          fi
+
       - name: Refresh the NSE holiday calendar
         if: env.EDITION == 'refresh-holidays'
         run: python -m briefing.cli refresh-holidays

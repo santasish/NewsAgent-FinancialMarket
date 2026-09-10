@@ -1,9 +1,12 @@
 import unittest
 
 from briefing.config import load_config
+from briefing.dedup import headline_key
+from briefing.fetch.base import FetchResult
 from briefing.filter.rules import apply_caps, rule_filter
 from briefing.filter.scorer import score_items
 from briefing.llm.stub import StubProvider
+from briefing.pipeline import gather_news
 
 
 class RuleGateTests(unittest.TestCase):
@@ -100,6 +103,40 @@ class ScorerTests(unittest.TestCase):
 
     def test_empty_input_is_handled(self):
         self.assertEqual(score_items(self.config, self.provider, []), ([], []))
+
+
+class GatherNewsDedupTests(unittest.TestCase):
+    """A later edition of the same day should not re-score a story an earlier one used."""
+
+    def setUp(self):
+        self.config = load_config()
+        self.provider = StubProvider(self.config)
+
+    def news_fetch(self, items):
+        return [FetchResult.success("news.google_rss", items)]
+
+    def test_a_previously_seen_story_is_excluded_before_scoring(self):
+        items = [
+            {"headline": "RBI keeps repo rate unchanged at 5.25%"},
+            {"headline": "Reliance board approves demerger of retail arm"},
+        ]
+        seen = {headline_key(items[0])}
+        kept, scored = gather_news(self.config, self.provider, self.news_fetch(items), already_seen=seen)
+        scored_headlines = {i.get("headline") for i in scored}
+        self.assertNotIn(items[0]["headline"], scored_headlines)
+        self.assertIn(items[1]["headline"], scored_headlines)
+
+    def test_no_seen_set_scores_everything_as_before(self):
+        items = [{"headline": "RBI keeps repo rate unchanged at 5.25%"}]
+        kept, scored = gather_news(self.config, self.provider, self.news_fetch(items))
+        self.assertEqual(len(scored), 1)
+
+    def test_everything_already_seen_yields_nothing_to_score(self):
+        items = [{"headline": "RBI keeps repo rate unchanged at 5.25%"}]
+        seen = {headline_key(items[0])}
+        kept, scored = gather_news(self.config, self.provider, self.news_fetch(items), already_seen=seen)
+        self.assertEqual(kept, [])
+        self.assertEqual(scored, [])
 
 
 if __name__ == "__main__":

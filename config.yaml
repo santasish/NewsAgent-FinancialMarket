@@ -67,3 +67,7 @@ google:
 
 output_dir: out
 raw_dir: raw
+# Tiny per-day headline fingerprints so the evening edition doesn't re-cover a story
+# the morning edition already used. Unlike out/ and raw/, this is meant to be
+# committed — see briefing/dedup.py and .github/workflows/briefing.yml.
+state_dir: state

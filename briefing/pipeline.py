@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from briefing.config import Config
+from briefing.dedup import headline_key, load_seen, record_seen
 from briefing.fetch import news as news_fetch
 from briefing.fetch.base import FetchResult, save_raw
 from briefing.filter import apply_caps, rule_filter, score_items
@@ -62,8 +63,15 @@ def gather_news(
     config: Config,
     provider: Provider,
     fetches: list[FetchResult],
+    *,
+    already_seen: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Rule-gate, score and cap everything text-shaped that was fetched."""
+    """Rule-gate, score and cap everything text-shaped that was fetched.
+
+    `already_seen` is the set of headline keys an earlier edition today already used —
+    see `briefing.dedup`. Excluding them before scoring, rather than after, also means
+    they never cost a Gemini call.
+    """
     items: list[dict[str, Any]] = []
     for name in NEWS_SOURCES:
         result = next((f for f in fetches if f.name == name), None)
@@ -74,6 +82,8 @@ def gather_news(
         return [], []
 
     candidates, _ = rule_filter(items)
+    if already_seen:
+        candidates = [c for c in candidates if headline_key(c) not in already_seen]
     kept, scored = score_items(config, provider, candidates)
     capped = apply_caps(kept, config.get("caps", {}))
     flattened = [item for group in capped.values() for item in group]
@@ -91,11 +101,14 @@ def run_pipeline(
     skip_news: bool = False,
 ) -> RunResult:
     fetches = fetch_all(config, include_news=not skip_news)
+    state_dir = Path(config.get("state_dir", "state"))
 
     news: list[dict[str, Any]] = []
     scored: list[dict[str, Any]] = []
     if not skip_news:
-        news, scored = gather_news(config, provider, fetches)
+        already_seen = load_seen(state_dir, day)
+        news, scored = gather_news(config, provider, fetches, already_seen=already_seen)
+        record_seen(state_dir, day, news)
 
     ctx = PayloadContext.from_results(fetches)
     for source_name, plain_name in NEWS_SOURCES.items():
