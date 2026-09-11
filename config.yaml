@@ -65,13 +65,6 @@ google:
   sheet_id: "1AP15p37SHqqCMQDM_371ERg84xuA5spvZk0noFqIWf4"
   calendar_id: "e1202998ac18a73d9cbae51b890b12f0fda8ac6e98a64adbff32d2fc2bb5b8c7@group.calendar.google.com"
 
-watchlist:
-  # A "Watchlist" tab in the same Sheet, read fresh on every morning and evening run —
-  # each edition gets its own live technicals/news, so the morning read reflects
-  # whatever happened overnight even though evening already covered the same names.
-  # Capped so one crowded day can't blow up token cost or run time.
-  max_symbols: 8
-
 output_dir: out
 raw_dir: raw
 # Tiny per-day headline fingerprints so the evening edition doesn't re-cover a story

@@ -3,16 +3,12 @@ from datetime import datetime
 
 from briefing.compute.derivatives import analyse_option_chain, max_pain
 from briefing.compute.market import breadth_ratio, fii_futures_stance, rank_sectors
-from briefing.compute.momentum import extra_technicals, price_momentum, rsi, rsi_assessment, volume_trend
 from briefing.compute.pivots import classic_pivots, compute_levels, drop_incomplete_session
 from briefing.schedule import IST
 
 
-def bar(day, high, low, close, open_=None, volume=None):
-    row = {"date": day, "open": open_ or close, "high": high, "low": low, "close": close}
-    if volume is not None:
-        row["volume"] = volume
-    return row
+def bar(day, high, low, close, open_=None):
+    return {"date": day, "open": open_ or close, "high": high, "low": low, "close": close}
 
 
 class PivotTests(unittest.TestCase):
@@ -118,69 +114,6 @@ class MarketTests(unittest.TestCase):
 
     def test_fii_stance_absent_when_columns_missing(self):
         self.assertIsNone(fii_futures_stance({"participants": {"FII": {"Total Long": 1}}}))
-
-
-class MomentumTests(unittest.TestCase):
-    """Watchlist-only technicals: see SPEC.md's note on why these are kept separate
-    from the market-wide pivots/DMA above.
-    """
-
-    def test_rsi_needs_enough_history(self):
-        self.assertIsNone(rsi([100.0] * 10, period=14))
-
-    def test_rsi_is_100_when_every_change_is_a_gain(self):
-        closes = [100.0 + i for i in range(20)]
-        self.assertEqual(rsi(closes, period=14), 100.0)
-
-    def test_rsi_is_low_when_every_change_is_a_loss(self):
-        closes = [120.0 - i for i in range(20)]
-        self.assertEqual(rsi(closes, period=14), 0.0)
-
-    def test_rsi_assessment_bands(self):
-        self.assertIn("stretched to the upside", rsi_assessment(75))
-        self.assertIn("stretched to the downside", rsi_assessment(20))
-        self.assertIn("neutral", rsi_assessment(50))
-
-    def test_rsi_assessment_never_says_overbought_or_oversold(self):
-        for value in (10, 30, 50, 70, 95):
-            text = rsi_assessment(value).lower()
-            self.assertNotIn("overbought", text)
-            self.assertNotIn("oversold", text)
-
-    def test_price_momentum_reads_direction_and_percent(self):
-        closes = [100.0] * 5 + [110.0]
-        result = price_momentum(closes, period=5)
-        self.assertEqual(result["direction"], "risen")
-        self.assertEqual(result["change_percent"], 10.0)
-        self.assertEqual(result["period_days"], 5)
-
-    def test_price_momentum_needs_enough_history(self):
-        self.assertIsNone(price_momentum([100.0, 101.0], period=5))
-
-    def test_volume_trend_flags_heavy_interest(self):
-        rows = [bar(f"day{i}", 100, 90, 95, volume=1000) for i in range(20)]
-        rows.append(bar("day20", 100, 90, 95, volume=2000))
-        result = volume_trend(rows, period=20)
-        self.assertEqual(result["ratio"], 2.0)
-        self.assertIn("unusually heavy", result["assessment"])
-
-    def test_volume_trend_needs_enough_history(self):
-        rows = [bar("day0", 100, 90, 95, volume=1000)]
-        self.assertIsNone(volume_trend(rows, period=20))
-
-    def test_extra_technicals_bundles_dma8_rsi_momentum_and_volume(self):
-        rows = [
-            bar(f"2026-08-{i:02d}", 100 + i, 90 + i, 95 + i, volume=1000)
-            for i in range(1, 25)
-        ]
-        bundle = extra_technicals(rows, now=datetime(2026, 9, 10, 18, 0, tzinfo=IST))
-        self.assertIn("dma_8", bundle)
-        self.assertIn("rsi", bundle)
-        self.assertIn("momentum", bundle)
-        self.assertIn("volume_trend", bundle)
-
-    def test_extra_technicals_empty_for_no_data(self):
-        self.assertEqual(extra_technicals([]), {})
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
-from briefing.compute.derivatives import analyse_option_chain, contract_snapshot
+from briefing.compute.derivatives import analyse_option_chain
 from briefing.compute.market import breadth_ratio, fii_futures_stance, rank_sectors
-from briefing.compute.momentum import extra_technicals
 from briefing.compute.pivots import classic_pivots, compute_levels
 
 __all__ = [
@@ -8,8 +7,6 @@ __all__ = [
     "breadth_ratio",
     "classic_pivots",
     "compute_levels",
-    "contract_snapshot",
-    "extra_technicals",
     "fii_futures_stance",
     "rank_sectors",
 ]

@@ -11,7 +11,7 @@ from briefing.compute import (
     fii_futures_stance,
     rank_sectors,
 )
-from briefing.payload.common import SOURCES, PayloadContext, levels_block, num, pct, shape_news, watchlist_block
+from briefing.payload.common import SOURCES, PayloadContext, num, pct, shape_news
 
 GLOBAL_SYMBOLS = ("sp500", "nasdaq", "dow", "nikkei", "hang_seng", "ftse", "dax")
 MACRO_SYMBOLS = ("brent_crude", "us_10y_yield", "dxy", "usd_inr")
@@ -38,11 +38,26 @@ def _quote_block(quotes: dict[str, Any], names) -> dict[str, Any]:
     }
 
 
+def _levels_block(levels: dict[str, Any]) -> dict[str, Any]:
+    pivots = levels["pivots"]
+    return {
+        "reference_session": levels["reference_session"],
+        "reference_close": num(levels["reference_close"]),
+        "r1": num(pivots["r1"]),
+        "r2": num(pivots["r2"]),
+        "pivot": num(pivots["pivot"]),
+        "s1": num(pivots["s1"]),
+        "s2": num(pivots["s2"]),
+        "dma_20": num(levels["dma_20"]),
+        "dma_50": num(levels["dma_50"]),
+        "trend": levels["trend"],
+    }
+
+
 def build_morning_payload(
     ctx: PayloadContext,
     day: date,
     news: list[dict[str, Any]],
-    watchlist: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {"date": day.isoformat()}
 
@@ -56,7 +71,7 @@ def build_morning_payload(
         for name in ("nifty_50", "bank_nifty"):
             levels = compute_levels(macro.get("history", {}).get(name, []))
             if levels:
-                pivots[name] = levels_block(levels)
+                pivots[name] = _levels_block(levels)
         if pivots:
             payload["key_technical_pivots"] = pivots
 
@@ -116,11 +131,6 @@ def build_morning_payload(
             section = CATEGORY_SECTIONS.get(item.get("category"), "key_catalysts")
         grouped.setdefault(section, []).append(shape_news(item))
     payload.update(grouped)
-
-    if watchlist:
-        shaped_watchlist = watchlist_block(watchlist, day)
-        if shaped_watchlist:
-            payload["watchlist"] = shaped_watchlist
 
     payload["sources"] = [SOURCES["pib"], SOURCES["nse_filings"], SOURCES["us_treasury"]]
     return ctx.finish(payload)

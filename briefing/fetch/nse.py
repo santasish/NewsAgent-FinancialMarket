@@ -10,8 +10,7 @@ from __future__ import annotations
 
 import csv
 import io
-import urllib.parse
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from typing import Any
 
 import requests
@@ -65,11 +64,6 @@ SECTOR_INDICES = (
     "NIFTY PSU BANK",
     "NIFTY CONSUMER DURABLES",
 )
-
-# The option-chain-v3 endpoint needs to know whether a symbol is an index or a single
-# stock; there is no way to ask it, so the small set of tradeable indices is listed here
-# and everything else is assumed to be a stock.
-INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "NIFTYNXT50"}
 
 
 class NSESession:
@@ -171,84 +165,29 @@ def fetch_fii_dii(session: NSESession) -> FetchResult:
     return with_retries("nse.fii_dii", run)
 
 
-def _parse_nse_expiry(text: str) -> date | None:
-    try:
-        return datetime.strptime(text.strip(), "%d-%b-%Y").date()
-    except (ValueError, AttributeError):
-        return None
-
-
-def _resolve_expiry(expiries: list[str], hint: str) -> str:
-    """Match a user-supplied expiry (any of a few common formats) to one NSE actually lists.
-
-    Falls back to the nearest expiry on or after the hint, then to the nearest expiry
-    overall, rather than failing outright — a slightly-off date typed into a spreadsheet
-    should still get the closest real contract, not an error.
-    """
-    hint = hint.strip()
-    for fmt in ("%d-%b-%Y", "%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
-        try:
-            target = datetime.strptime(hint, fmt).date()
-            break
-        except ValueError:
-            continue
-    else:
-        # No year given (e.g. "29 Sep"): assume this year rather than let strptime
-        # guess (Python 3.15 will start rejecting a year-less parse outright).
-        target = None
-        for fmt in ("%d %b %Y", "%d-%b %Y"):
-            try:
-                target = datetime.strptime(f"{hint} {date.today().year}", fmt).date()
-                break
-            except ValueError:
-                continue
-        if target is None:
-            return expiries[0]
-
-    parsed = [(e, _parse_nse_expiry(e)) for e in expiries]
-    parsed = [(e, d) for e, d in parsed if d is not None]
-    if not parsed:
-        return expiries[0]
-
-    on_or_after = [(e, d) for e, d in parsed if d >= target]
-    if on_or_after:
-        return min(on_or_after, key=lambda pair: pair[1])[0]
-    return min(parsed, key=lambda pair: abs((pair[1] - target).days))[0]
-
-
-def fetch_option_chain(
-    session: NSESession, symbol: str = "NIFTY", *, expiry: str | None = None
-) -> FetchResult:
-    """Option chain rows for a symbol's nearest expiry, or one matching `expiry`.
-
-    PCR / OI walls / a specific contract's premium are all derived in briefing.compute.
-    """
+def fetch_option_chain(session: NSESession, symbol: str = "NIFTY") -> FetchResult:
+    """Nearest-expiry option chain rows. PCR / OI walls are derived in briefing.compute."""
 
     def run() -> dict[str, Any]:
         referer = f"{BASE}/option-chain"
-        segment = "Indices" if symbol.upper() in INDEX_SYMBOLS else "Stock"
-        # A symbol like "GVT&D" breaks the query string if interpolated raw — the "&"
-        # reads as a parameter separator and silently truncates it to "GVT".
-        quoted_symbol = urllib.parse.quote(symbol, safe="")
         info = session.get_json(
-            f"/api/option-chain-contract-info?symbol={quoted_symbol}", referer=referer
+            f"/api/option-chain-contract-info?symbol={symbol}", referer=referer
         )
         expiries = info.get("expiryDates") or []
         if not expiries:
             raise ValueError(f"no expiry dates for {symbol}")
-        chosen = _resolve_expiry(expiries, expiry) if expiry else expiries[0]
+        expiry = expiries[0]
         raw = session.get_json(
-            f"/api/option-chain-v3?type={segment}&symbol={quoted_symbol}"
-            f"&expiry={urllib.parse.quote(chosen, safe='')}",
+            f"/api/option-chain-v3?type=Indices&symbol={symbol}&expiry={expiry}",
             referer=referer,
         )
         records = raw.get("records") or {}
         rows = records.get("data") or []
         if not rows:
-            raise ValueError(f"empty option chain for {symbol} {chosen}")
+            raise ValueError(f"empty option chain for {symbol} {expiry}")
         return {
             "symbol": symbol,
-            "expiry": chosen,
+            "expiry": expiry,
             "underlying": _num(records.get("underlyingValue")),
             "timestamp": records.get("timestamp"),
             "rows": [
@@ -256,19 +195,14 @@ def fetch_option_chain(
                     "strike": _num(row.get("strikePrice")),
                     "call_oi": _num((row.get("CE") or {}).get("openInterest")),
                     "call_oi_change": _num((row.get("CE") or {}).get("changeinOpenInterest")),
-                    "call_ltp": _num((row.get("CE") or {}).get("lastPrice")),
-                    "call_iv": _num((row.get("CE") or {}).get("impliedVolatility")),
                     "put_oi": _num((row.get("PE") or {}).get("openInterest")),
                     "put_oi_change": _num((row.get("PE") or {}).get("changeinOpenInterest")),
-                    "put_ltp": _num((row.get("PE") or {}).get("lastPrice")),
-                    "put_iv": _num((row.get("PE") or {}).get("impliedVolatility")),
                 }
                 for row in rows
             ],
         }
 
-    name = f"nse.option_chain.{symbol.lower()}" + (f".{expiry}" if expiry else "")
-    return with_retries(name, run)
+    return with_retries(f"nse.option_chain.{symbol.lower()}", run)
 
 
 def _announcement(row: dict[str, Any]) -> dict[str, Any]:
