@@ -5,7 +5,7 @@ editions:
   # archive row — not the cron trigger itself. See .github/workflows/briefing.yml for
   # why the actual cron minutes are a few minutes earlier and deliberately not round.
   morning:  {time: "06:30", days: all}
-  evening:  {time: "20:00", days: all}
+  evening:  {time: "18:30", days: all}
 
 llm:
   provider: gemini            # gemini | anthropic | openai | stub

@@ -12,12 +12,12 @@ name: Daily market briefing
 # that a `schedule` run can still be delayed by hours with no fixed upper bound. Two
 # consecutive real runs on 2026-09-10/11 landed 4-5 hours late on the old :30 times.
 #   ~6:23 IST -> 00:53 UTC  (morning edition, target 6:30 IST)
-#   ~19:53 IST -> 14:23 UTC (evening edition, target 20:00 IST)
+#   ~18:23 IST -> 12:53 UTC (evening edition, target 18:30 IST)
 #   02:00 IST Sunday -> 20:30 UTC Saturday (holiday-calendar refresh; not time-sensitive)
 on:
   schedule:
     - cron: "53 0 * * *"
-    - cron: "23 14 * * *"
+    - cron: "53 12 * * *"
     - cron: "30 20 * * 6"
   workflow_dispatch:
     inputs:
@@ -56,7 +56,7 @@ jobs:
           else
             case "${{ github.event.schedule }}" in
               "53 0 * * *")  echo "EDITION=morning" >> "$GITHUB_ENV" ;;
-              "23 14 * * *") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
+              "53 12 * * *") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
               "30 20 * * 6") echo "EDITION=refresh-holidays" >> "$GITHUB_ENV" ;;
               *) echo "unrecognised schedule: ${{ github.event.schedule }}" >&2; exit 1 ;;
             esac
