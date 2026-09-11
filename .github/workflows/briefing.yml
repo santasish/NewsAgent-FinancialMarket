@@ -2,13 +2,22 @@ name: Daily market briefing
 
 # Cron runs in UTC only; India Standard Time is UTC+5:30 with no daylight saving,
 # so the offset here never drifts.
-#   08:00 IST -> 02:30 UTC  (morning edition)
-#   18:00 IST -> 12:30 UTC  (evening edition)
-#   02:00 IST Sunday -> 20:30 UTC Saturday (holiday-calendar refresh)
+#
+# GitHub deprioritises `schedule` runs under load, and load peaks exactly on the
+# round minutes (:00, :30) that most other repos also use — see
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule.
+# The morning/evening times below land a few minutes early on deliberately odd
+# minutes to dodge that queue, not on the clean IST times a user would ask for.
+# This is a best-effort mitigation, not a guarantee: GitHub's own docs are explicit
+# that a `schedule` run can still be delayed by hours with no fixed upper bound. Two
+# consecutive real runs on 2026-09-10/11 landed 4-5 hours late on the old :30 times.
+#   ~6:23 IST -> 00:53 UTC  (morning edition, target 6:30 IST)
+#   ~19:53 IST -> 14:23 UTC (evening edition, target 20:00 IST)
+#   02:00 IST Sunday -> 20:30 UTC Saturday (holiday-calendar refresh; not time-sensitive)
 on:
   schedule:
-    - cron: "30 2 * * *"
-    - cron: "30 12 * * *"
+    - cron: "53 0 * * *"
+    - cron: "23 14 * * *"
     - cron: "30 20 * * 6"
   workflow_dispatch:
     inputs:
@@ -46,8 +55,8 @@ jobs:
             echo "EDITION=${{ inputs.edition }}" >> "$GITHUB_ENV"
           else
             case "${{ github.event.schedule }}" in
-              "30 2 * * *")  echo "EDITION=morning" >> "$GITHUB_ENV" ;;
-              "30 12 * * *") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
+              "53 0 * * *")  echo "EDITION=morning" >> "$GITHUB_ENV" ;;
+              "23 14 * * *") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
               "30 20 * * 6") echo "EDITION=refresh-holidays" >> "$GITHUB_ENV" ;;
               *) echo "unrecognised schedule: ${{ github.event.schedule }}" >&2; exit 1 ;;
             esac
