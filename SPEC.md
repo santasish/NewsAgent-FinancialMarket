@@ -21,7 +21,7 @@ newsletter prose (see §1a). Supersedes the raw notes pasted into chat.
 | Impact depth | Three layers (immediate effect, knock-on to related firms, wider economy and flows) for macro and index-level items; two for company-level items. Written as prose; the layers are never labelled. |
 | Scoring gate | Category-aware: score 0–10 + label {macro, earnings, mna, microcap, pib, global}; keep score >= 6 |
 | Budget | $0 / month. Everything on free tiers. |
-| Hosting | GitHub Actions scheduled workflow (revised 2026-09-10 — see below; Oracle Always-Free sign-up did not succeed) |
+| Hosting | GitHub Actions (revised 2026-09-10; Oracle Always-Free sign-up did not succeed). Trigger revised again 2026-09-11: an external free cron service fires `repository_dispatch`, not GitHub's native `schedule` — see below and deploy/GITHUB_ACTIONS.md. |
 | Google auth | Service account; Drive folder, Sheet and Calendar shared to it |
 | Repo shape | Single Python package, one CLI: `briefing run --edition morning|evening` |
 | Alerting | Email on failure + `DEGRADED` banner at top of any briefing with missing sections |
@@ -328,7 +328,7 @@ Oracle VM, or the user's own machine. Do not revisit unless the egress policy ch
 | 3. Generation ✅ | 4 payload builders, pipeline orchestration, `run` wired to live data, Gemini adapter with token accounting | Morning and evening both generate from live data and verify clean (75 and 71 numbers traceable in the plain-prose versions); 56 tests pass |
 | 3a. Rewrite ✅ | Addendum removed; plain-newsletter prompts; scorer subject rule and source tags; optional sources; heading-based Telegram/email layout; fixtures refreshed from live output | Both editions read as prose with no order labels or acronyms, and verify clean |
 | 4. Verify + Deliver ◐ | verifier ✅, missing-data note ✅, Telegram + email + Sheets + Calendar + alerts built; Sheets and Calendar verified | **Remaining: no delivery channel is configured in `.env` — fill in Telegram or Gmail.** |
-| 5. Schedule ◐ | Oracle VM path built (bootstrap, cron wrapper, DEPLOY.md) but sign-up did not go through; pivoted to a GitHub Actions workflow instead — see `deploy/GITHUB_ACTIONS.md` and `.github/workflows/briefing.yml` | Workflow written: two daily schedules plus a weekly holiday-calendar refresh that commits itself back. Oracle scripts kept as a documented fallback, not deleted. **Remaining: confirm the schedule actually fires unattended for a few days once secrets are in place.** |
+| 5. Schedule ◐ | Oracle VM path built (bootstrap, cron wrapper, DEPLOY.md) but sign-up did not go through; pivoted to a GitHub Actions workflow instead — see `deploy/GITHUB_ACTIONS.md` and `.github/workflows/briefing.yml`. GitHub's native `schedule` trigger was then confirmed (2026-09-10/11) to run 4-5 hours late, so morning/evening are now fired by `repository_dispatch` from an external free cron service instead; native `schedule` is kept only for the non-time-sensitive weekly holiday refresh. | Workflow updated and pushed. Oracle scripts kept as a documented fallback, not deleted. **Remaining: the user needs to do the one-time external-cron setup in `deploy/GITHUB_ACTIONS.md` §4 (create a GitHub PAT, create the cron-job.org jobs) — this cannot be done on their behalf.** |
 | 6. Hardening | retries, raw snapshot archiving, cost logging, prompt tuning from real outputs | you sign off on output quality |
 
 ---

@@ -1,24 +1,21 @@
 name: Daily market briefing
 
-# Cron runs in UTC only; India Standard Time is UTC+5:30 with no daylight saving,
-# so the offset here never drifts.
+# Morning and evening are fired by `repository_dispatch`, not GitHub's native `schedule`
+# trigger. GitHub's own docs say `schedule` runs are deprioritised under load with no
+# timing guarantee at all, and two real runs on 2026-09-10/11 landed 4-5 hours late.
+# `repository_dispatch` (and `workflow_dispatch`) go through the normal runner queue
+# instead, so an external clock — a free cron service such as cron-job.org, configured
+# to hit https://api.github.com/repos/<owner>/<repo>/dispatches with
+# {"event_type": "run-morning"} / {"event_type": "run-evening"} at 6:30am / 6:30pm
+# IST — is the actual scheduler now. See deploy/GITHUB_ACTIONS.md for the one-time setup.
 #
-# GitHub deprioritises `schedule` runs under load, and load peaks exactly on the
-# round minutes (:00, :30) that most other repos also use — see
-# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule.
-# The morning/evening times below land a few minutes early on deliberately odd
-# minutes to dodge that queue, not on the clean IST times a user would ask for.
-# This is a best-effort mitigation, not a guarantee: GitHub's own docs are explicit
-# that a `schedule` run can still be delayed by hours with no fixed upper bound. Two
-# consecutive real runs on 2026-09-10/11 landed 4-5 hours late on the old :30 times.
-#   ~6:23 IST -> 00:53 UTC  (morning edition, target 6:30 IST)
-#   ~18:23 IST -> 12:53 UTC (evening edition, target 18:30 IST)
-#   02:00 IST Sunday -> 20:30 UTC Saturday (holiday-calendar refresh; not time-sensitive)
+# `schedule` is kept only for the weekly holiday-calendar refresh, which isn't
+# time-sensitive, so its multi-hour slop doesn't matter.
 on:
+  repository_dispatch:
+    types: [run-morning, run-evening]
   schedule:
-    - cron: "53 0 * * *"
-    - cron: "53 12 * * *"
-    - cron: "30 20 * * 6"
+    - cron: "30 20 * * 6"   # ~02:00 IST Sunday; holiday-calendar refresh only
   workflow_dispatch:
     inputs:
       edition:
@@ -47,16 +44,22 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # Scheduled runs don't say in plain text which cron fired; map it to an edition.
-      # A manual run carries its own choice in github.event.inputs.edition instead.
+      # Three trigger shapes carry the edition differently: a manual run gives its own
+      # choice in inputs.edition; the external cron's repository_dispatch call carries
+      # it as the event_type ("run-morning"/"run-evening"), surfaced as github.event.action;
+      # the one remaining native schedule is only ever the holiday refresh.
       - name: Pick the edition for this run
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "EDITION=${{ inputs.edition }}" >> "$GITHUB_ENV"
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            case "${{ github.event.action }}" in
+              "run-morning") echo "EDITION=morning" >> "$GITHUB_ENV" ;;
+              "run-evening") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
+              *) echo "unrecognised repository_dispatch type: ${{ github.event.action }}" >&2; exit 1 ;;
+            esac
           else
             case "${{ github.event.schedule }}" in
-              "53 0 * * *")  echo "EDITION=morning" >> "$GITHUB_ENV" ;;
-              "53 12 * * *") echo "EDITION=evening" >> "$GITHUB_ENV" ;;
               "30 20 * * 6") echo "EDITION=refresh-holidays" >> "$GITHUB_ENV" ;;
               *) echo "unrecognised schedule: ${{ github.event.schedule }}" >&2; exit 1 ;;
             esac
